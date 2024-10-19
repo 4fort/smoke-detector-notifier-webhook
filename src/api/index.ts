@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(logger);
 
 app.get("/api/webhook", (req: Request, res: Response) => {
-  let VERIFY_TOKEN = PAGE_ACCESS_TOKEN;
+  let VERIFY_TOKEN = PAGE_VERIFICATION_TOKEN;
 
   let mode = req.query["hub.mode"];
   let token = req.query["hub.verify_token"];
