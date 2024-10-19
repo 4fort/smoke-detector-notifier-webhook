@@ -35,17 +35,17 @@ app.get("/api", (req: Request, res: Response) => {
 });
 
 // Receive messages or events (from ESP32 or Facebook)
-app.post("/api/webhook", (req: Request, res: Response) => {
+app.post("/api/webhook", async (req: Request, res: Response) => {
+  const text = "Smoke detected!";
   let body = req.body;
 
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && USER_ID) {
-    sendFacebookMessage(USER_ID, "Smoke detected!");
+    await sendFacebookMessage(USER_ID, text);
+    res.status(200).send("EVENT_RECEIVED");
   } else {
-    res.status(400).send(body);
+    res.status(500).send(`ERROR: ${body}`);
   }
-
-  res.status(200).send("EVENT_RECEIVED");
 });
 
 async function sendFacebookMessage(recipientId: string, text: string) {
