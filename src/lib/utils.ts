@@ -42,17 +42,18 @@ export function statusCodeDecorator(
   let status;
   let emoji;
   if (statusCode >= 500) {
-    status = setTextStyle(statusCode, "yellow");
+    // status = setTextStyle(statusCode, "yellow");
     emoji = "⚠️";
   } else if (statusCode >= 400) {
-    status = setTextStyle(statusCode, "red");
+    // status = setTextStyle(statusCode, "red");
     emoji = "❌";
   } else if (statusCode >= 200) {
-    status = setTextStyle(statusCode, "green");
+    // status = setTextStyle(statusCode, "green");
     emoji = "✅";
   } else {
-    status = setTextStyle(statusCode, "reset");
+    // status = setTextStyle(statusCode, "reset");
     emoji = "✅";
   }
-  return { status, emoji };
+
+  return { status: statusCode.toString(), emoji };
 }

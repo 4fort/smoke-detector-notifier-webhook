@@ -9,9 +9,7 @@ const logger = express().use((req: Request, res: Response, next) => {
     const statusCode = res.statusCode;
     let { status, emoji } = statusCodeDecorator(statusCode);
 
-    console.log(
-      `${emoji}[${timestamp}]:\x1b[1m ${status} ${method} \x1b[0m${url}`
-    );
+    console.log(`${emoji}[${timestamp}]: ${status} ${method} ${url}`);
   });
 
   next();
