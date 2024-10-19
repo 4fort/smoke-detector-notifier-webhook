@@ -1,11 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import logger from "./middleware";
+import logger from "../middleware";
 
 dotenv.config();
 
-export const app: Express = express();
+const app: Express = express();
 const PORT = process.env.PORT;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use(logger);
 
-app.get("/webhook", (req: Request, res: Response) => {
+app.get("/api/webhook", (req: Request, res: Response) => {
   let VERIFY_TOKEN = PAGE_ACCESS_TOKEN;
 
   let mode = req.query["hub.mode"];
@@ -29,12 +29,12 @@ app.get("/webhook", (req: Request, res: Response) => {
   }
 });
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/api", (req: Request, res: Response) => {
   res.send("Smoke Detection webhook server is running");
 });
 
 // Receive messages or events (from ESP32 or Facebook)
-app.post("/webhook", (req: Request, res: Response) => {
+app.post("/api/webhook", (req: Request, res: Response) => {
   let body = req.body;
 
   // Handle ESP32 smoke detection payload
@@ -72,3 +72,5 @@ function sendFacebookMessage(recipientId: string, text: string) {
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
+
+export default app;
