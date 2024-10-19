@@ -29,6 +29,10 @@ app.get("/webhook", (req: Request, res: Response) => {
   }
 });
 
+app.get("/", (req: Request, res: Response) => {
+  res.send("Smoke Detection webhook server is running");
+});
+
 // Receive messages or events (from ESP32 or Facebook)
 app.post("/webhook", (req: Request, res: Response) => {
   let body = req.body;
