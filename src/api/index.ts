@@ -7,6 +7,7 @@ dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT;
+const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 const USER_ID = process.env.USER_ID;
@@ -40,33 +41,43 @@ app.post("/api/webhook", (req: Request, res: Response) => {
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && USER_ID) {
     sendFacebookMessage(USER_ID, "Smoke detected!");
+  } else {
+    res.status(400).send(body);
   }
 
   res.status(200).send("EVENT_RECEIVED");
 });
 
-function sendFacebookMessage(recipientId: string, text: string) {
-  const request = require("request");
+async function sendFacebookMessage(recipientId: string, text: string) {
   const messageData = {
     recipient: { id: recipientId },
+    messaging_type: "RESPONSE",
     message: { text: text },
+    access_token: PAGE_ACCESS_TOKEN,
   };
 
-  request(
-    {
-      url: "https://graph.facebook.com/v12.0/me/messages",
-      qs: { access_token: PAGE_ACCESS_TOKEN },
-      method: "POST",
-      json: messageData,
-    },
-    (error: Error, response: Response, body: any) => {
-      if (!error && response.statusCode === 200) {
-        console.log("Message sent");
-      } else {
-        console.error("Unable to send message:", error);
+  try {
+    console.log("Sending message: ", messageData);
+    const response = await fetch(
+      `https://graph.facebook.com/v21.0/${PAGE_ID}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageData),
       }
+    );
+
+    if (response.ok) {
+      console.log("Message sent");
+    } else {
+      const errorBody = await response.json();
+      console.error("Unable to send message:", errorBody.error);
     }
-  );
+  } catch (error) {
+    console.error("Fetch error:", error);
+  }
 }
 
 app.listen(PORT, () => {
