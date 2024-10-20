@@ -6,7 +6,7 @@ dotenv.config();
 const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
-export async function getConfig(req: string) {
+export async function getConfig(key: string) {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
 
@@ -22,7 +22,33 @@ export async function getConfig(req: string) {
 
       if (response.ok) {
         const data = await response.json();
-        return data[req];
+        return data[key];
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching user ID from config: ", error);
+    return null;
+  }
+}
+
+export async function setConfig(key: string, value: string) {
+  const CONFIG_URL = process.env.CONFIGURATION_URL;
+  const CONFIG_KEY = process.env.CONFIGURATION_KEY;
+
+  try {
+    if (CONFIG_URL && CONFIG_KEY) {
+      const response = await fetch(CONFIG_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-SILO-KEY": CONFIG_KEY,
+        },
+        body: JSON.stringify({ [key]: value }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data[key];
       }
     }
   } catch (error) {
