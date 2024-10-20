@@ -62,8 +62,10 @@ export async function webhookCallback(req: Request, res: Response) {
     });
   }
 
-  if (USER_ID)
+  if (USER_ID) {
     sendFacebookMessage(USER_ID, "An error occured. Please try again later.");
+    return;
+  }
   res.sendStatus(404);
 }
 
