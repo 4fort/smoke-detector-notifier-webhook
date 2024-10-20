@@ -36,8 +36,27 @@ app.get("/api/webhook", (req: Request, res: Response) => {
   }
 });
 
-// Receive messages or events (from ESP32 or Facebook)
 app.post("/api/webhook", async (req: Request, res: Response) => {
+  const body = req.body;
+  if (body.object === "page") {
+    body.entry.forEach(async (entry: any) => {
+      const webhook_event = entry.messaging[0];
+
+      console.log(webhook_event);
+      const { error } = await sendFacebookMessage(
+        webhook_event.sender.id,
+        `Your OTN is: ${webhook_event}`
+      );
+      res.status(200).send({
+        status: "EVENT_RECEIVED",
+        error: error ? error : null,
+      });
+    });
+  }
+});
+
+// Receive messages or events (from ESP32 or Facebook)
+app.post("/api/webhook/smoke-detected", async (req: Request, res: Response) => {
   const text = "Smoke detected! at " + formatDate(new Date());
   const body = req.body;
 
@@ -57,25 +76,7 @@ app.post("/api/webhook", async (req: Request, res: Response) => {
 });
 
 app.post("/api/webhook/otn-req", async (req: Request, res: Response) => {
-  const body = req.body;
   const text = "Click below to receive a one-time notification.";
-
-  if (body.object === "page") {
-    body.entry.forEach(async (entry: any) => {
-      const webhook_event = entry.messaging[0];
-
-      console.log(webhook_event);
-      const { error } = await sendFacebookMessage(
-        webhook_event.sender.id,
-        text
-      );
-      res.status(200).send({
-        status: "EVENT_RECEIVED",
-        error: error ? error : null,
-      });
-    });
-    return;
-  }
 
   if (!USER_ID) {
     res.status(500).send({
