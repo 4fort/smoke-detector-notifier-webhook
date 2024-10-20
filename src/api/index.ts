@@ -56,16 +56,23 @@ app.post("/api/webhook", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/api/webhook/tag", async (req: Request, res: Response) => {
+app.post("/api/webhook/otn-req", async (req: Request, res: Response) => {
   const body = req.body;
   const text = "Click below to receive a one-time notification.";
 
   if (body.object === "page") {
-    body.entry.forEach((entry: any) => {
+    body.entry.forEach(async (entry: any) => {
       const webhook_event = entry.messaging[0];
 
       console.log(webhook_event);
-      res.status(200).send({ status: "EVENT_RECEIVED", webhook_event });
+      const { error } = await sendFacebookMessage(
+        webhook_event.sender.id,
+        text
+      );
+      res.status(200).send({
+        status: "EVENT_RECEIVED",
+        error: error ? error : null,
+      });
     });
     return;
   }
