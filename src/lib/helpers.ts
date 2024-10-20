@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
+import { ONE_TIME_NOTIF_TOKEN } from "../api";
 
 dotenv.config();
 
 const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
-const ONE_TIME_NOTIF_TOKEN = process.env.ONE_TIME_NOTIF_TOKEN;
 
 export async function getConfig(req: string) {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
