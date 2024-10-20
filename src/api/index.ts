@@ -42,17 +42,33 @@ app.post("/api/webhook", async (req: Request, res: Response) => {
     body.entry.forEach(async (entry: any) => {
       const webhook_event = entry.messaging[0];
 
+      if (webhook_event.optin && webhook_event.optin.one_time_notif_token) {
+        const otn_token = webhook_event.optin.one_time_notif_token;
+        const user_id = webhook_event.sender.id;
+        const payload = webhook_event.optin.payload;
+
+        // Log or store the OTN token along with the user ID
+        console.log("Received OTN Token:", otn_token);
+        console.log("For user:", user_id);
+
+        // Store in your database for future use
+        const { error } = await sendFacebookMessage(
+          webhook_event.sender.id,
+          `Your OTN is: ${otn_token} and your payload is: ${payload}. Please don't share it with anyone!`
+        );
+        res.status(200).send({
+          status: "EVENT_RECEIVED",
+          error: error ? error : null,
+        });
+      }
+
       console.log(webhook_event);
-      const { error } = await sendFacebookMessage(
-        webhook_event.sender.id,
-        `Your OTN is: ${webhook_event}`
-      );
-      res.status(200).send({
-        status: "EVENT_RECEIVED",
-        error: error ? error : null,
-      });
     });
   }
+
+  if (USER_ID)
+    sendFacebookMessage(USER_ID, "An error occured. Please try again later.");
+  res.sendStatus(404);
 });
 
 // Receive messages or events (from ESP32 or Facebook)
