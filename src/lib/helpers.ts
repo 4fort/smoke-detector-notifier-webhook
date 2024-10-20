@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { ONE_TIME_NOTIF_TOKEN } from "../api";
+import { ONE_TIME_NOTIF_TOKEN } from "../controllers/webhookController";
 
 dotenv.config();
 
@@ -22,6 +22,11 @@ export async function getConfig(key: string) {
 
       if (response.ok) {
         const data = await response.json();
+
+        if (key == "") {
+          return data;
+        }
+
         return data[key];
       }
     }
