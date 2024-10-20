@@ -60,26 +60,26 @@ app.post("/api/webhook/tag", async (req: Request, res: Response) => {
   const body = req.body;
   const text = "Click below to receive a one-time notification.";
 
-  // if (body.object === "page") {
-  //   body.entry.forEach((entry: any) => {
-  //     const webhook_event = entry.messaging[0];
+  if (body.object === "page") {
+    body.entry.forEach((entry: any) => {
+      const webhook_event = entry.messaging[0];
 
-  //     if (webhook_event.optin && webhook_event.optin.one_time_notif_token) {
-  //       const otn_token = webhook_event.optin.one_time_notif_token;
-  //       const user_id = webhook_event.sender.id;
+      if (webhook_event.optin && webhook_event.optin.one_time_notif_token) {
+        const otn_token = webhook_event.optin.one_time_notif_token;
+        const user_id = webhook_event.sender.id;
 
-  //       console.log(
-  //         `One-time notification token: ${otn_token} for user_id: ${user_id}`
-  //       );
-  //       res.status(200).send({ status: "EVENT_RECEIVED", otn_token, user_id });
-  //     }
-  //   });
-
-  //   return;
-  // }
-  if (body) {
-    console.log(body);
-    res.status(200).send({ status: "EVENT_RECEIVED", body });
+        console.log(
+          `One-time notification token: ${otn_token} for user_id: ${user_id}`
+        );
+        res.status(200).send({ status: "EVENT_RECEIVED", otn_token, user_id });
+      }
+    });
+    return;
+  } else {
+    res.status(404).send({
+      status: "EVENT_RECEIVED",
+      error: { message: "Unknown event", body },
+    });
     return;
   }
 
