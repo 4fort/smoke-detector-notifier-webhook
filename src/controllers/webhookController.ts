@@ -58,12 +58,14 @@ export async function webhookCallback(req: Request, res: Response) {
       }
 
       console.log(webhook_event);
-      return;
     });
+    res.sendStatus(200);
+    return;
   }
 
   if (USER_ID) {
-    sendFacebookMessage(USER_ID, "An error occured. Please try again later.");
+    sendFacebookMessage(USER_ID, "Request unkown. Please try again later.");
+    res.sendStatus(200);
     return;
   }
   res.sendStatus(404);
