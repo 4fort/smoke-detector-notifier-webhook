@@ -75,6 +75,8 @@ export async function smokeDetected(req: Request, res: Response) {
   const text = "Smoke detected! at " + formatDate(new Date());
   const body = req.body;
 
+  console.log(USER_ID);
+
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && USER_ID) {
     const { error } = await sendFacebookMessage(USER_ID, text);
