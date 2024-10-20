@@ -23,6 +23,8 @@ export async function getConfig(key: string) {
       if (response.ok) {
         const data = await response.json();
 
+        console.log("Config Data: ", data);
+
         if (key == "") {
           return data;
         }
