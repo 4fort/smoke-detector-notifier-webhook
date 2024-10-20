@@ -38,6 +38,7 @@ app.get("/api/webhook", (req: Request, res: Response) => {
 
 app.post("/api/webhook", async (req: Request, res: Response) => {
   const body = req.body;
+  console.log(body);
   if (body.object === "page") {
     body.entry.forEach(async (entry: any) => {
       const webhook_event = entry.messaging[0];
