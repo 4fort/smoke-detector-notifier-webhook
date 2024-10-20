@@ -64,6 +64,7 @@ app.post("/api/webhook", async (req: Request, res: Response) => {
       }
 
       console.log(webhook_event);
+      return;
     });
   }
 
