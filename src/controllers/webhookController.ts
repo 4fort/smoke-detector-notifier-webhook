@@ -3,6 +3,7 @@ import {
   getConfig,
   sendFacebookMessage,
   sendFacebookMessageTag,
+  setConfig,
 } from "../lib/helpers";
 import { formatDate } from "../lib/utils";
 import dotenv from "dotenv";
@@ -41,6 +42,9 @@ export async function webhookCallback(req: Request, res: Response) {
         // Log or store the OTN token along with the user ID
         console.log("Received OTN Token:", otn_token);
         console.log("For user:", user_id);
+
+        setConfig("USER_ID", user_id);
+        setConfig("ONE_TIME_NOTIF_TOKEN", otn_token);
 
         // Store in your database for future use
         const { error } = await sendFacebookMessage(
