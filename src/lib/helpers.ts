@@ -12,15 +12,15 @@ export async function handleMessage(senderID: string, messageText: string) {
   if (messageText === PAGE_VERIFICATION_TOKEN) {
     sendOptInMessage(senderID);
     await sendFacebookMessage(
-      senderID,
-      "You entered the correct verification token."
+      "You entered the correct verification token.",
+      senderID
     );
     // await sendFacebookMessageNotifMsgReq(senderID);
   }
 
   await sendFacebookMessage(
-    senderID,
-    "Please provide the correct verification token."
+    "Please provide the correct verification token.",
+    senderID
   );
 }
 
