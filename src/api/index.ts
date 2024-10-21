@@ -5,6 +5,7 @@ import logger from "../middleware";
 import { formatDate } from "../lib/utils";
 import {
   otnRequest,
+  sendMessage,
   smokeDetected,
   verifyToken,
   webhookCallback,
@@ -47,6 +48,8 @@ app.post("/api/webhook", webhookCallback);
 app.post("/api/webhook/smoke-detected", smokeDetected);
 
 app.post("/api/webhook/otn-req", otnRequest);
+
+app.post("/api/webhook/send-message", sendMessage);
 
 app.listen(PORT, () => {
   setup();
