@@ -29,10 +29,13 @@ export async function getConfig(key: string) {
         }
 
         return data[key];
+      } else {
+        console.error("Error fetching user ID from config: ", response);
+        return null;
       }
     }
   } catch (error) {
-    console.error("Error fetching user ID from config: ", error);
+    console.error("Error fetching config: ", error);
     return null;
   }
 }
@@ -53,6 +56,9 @@ export async function setConfig(_data: Record<string, string | number>) {
 
       if (response.ok) {
         return await response.json();
+      } else {
+        console.error("Error fetching config: ", response);
+        return null;
       }
     }
   } catch (error) {
