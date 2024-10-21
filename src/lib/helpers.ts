@@ -141,14 +141,14 @@ export async function sendFacebookMessage(recipientId: string, text: string) {
       }
     );
 
-    if (response.ok) {
-      console.log("Message sent");
-      return { error: null };
-    } else {
+    if (!response.ok) {
       const errorBody = await response.json();
       console.error("Unable to send message:", errorBody.error);
       return { error: errorBody.error };
     }
+
+    console.log("Message sent");
+    return { error: null };
   } catch (error) {
     console.error("Fetch error:", error);
     return { error: error };
