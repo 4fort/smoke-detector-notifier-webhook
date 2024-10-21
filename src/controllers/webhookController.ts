@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   getConfig,
   sendFacebookMessage,
+  sendFacebookMessageNotifMsgReq,
   sendFacebookMessageTag,
   setConfig,
 } from "../lib/helpers";
@@ -133,6 +134,22 @@ export async function otnRequest(req: Request, res: Response) {
   }
 
   const { error } = await sendFacebookMessageTag(USER_ID, text);
+  res.status(200).send({
+    status: "EVENT_RECEIVED",
+    error: error ? error : null,
+  });
+}
+
+export async function notifMsgRequest(req: Request, res: Response) {
+  const config = await getConfig();
+  const id = config.USER_ID;
+
+  const { error, response } = await sendFacebookMessageNotifMsgReq(id);
+  if (!error && response) {
+    console.log(response);
+  } else {
+    console.error(error);
+  }
   res.status(200).send({
     status: "EVENT_RECEIVED",
     error: error ? error : null,

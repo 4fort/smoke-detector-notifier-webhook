@@ -154,3 +154,51 @@ export async function sendFacebookMessageTag(
     return { error: error, response: null };
   }
 }
+
+export async function sendFacebookMessageNotifMsgReq(recipientId: string) {
+  const messageData = {
+    recipient: { id: recipientId },
+    message: {
+      attachment: {
+        type: "template",
+        payload: {
+          template_type: "notification_messages",
+          notification_messages_timezone: "UTC",
+          title: "TITLE",
+          image_url: "IMAGE-URL",
+          payload: "ADDITIONAL-WEBHOOK-INFORMATION",
+        },
+      },
+    },
+    access_token: PAGE_ACCESS_TOKEN,
+  };
+
+  try {
+    console.log("Sending notification message request: ", messageData);
+    const response = await fetch(
+      `https://graph.facebook.com/v21.0/${PAGE_ID}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageData),
+      }
+    );
+
+    if (response.ok) {
+      console.log("Notification Message Request sent");
+      return { error: null, response: await response.json() };
+    } else {
+      const errorBody = await response.json();
+      console.error(
+        "Unable to send notification message request:",
+        errorBody.error
+      );
+      return { error: errorBody.error, response: null };
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return { error: error, response: null };
+  }
+}
