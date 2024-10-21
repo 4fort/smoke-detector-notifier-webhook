@@ -74,9 +74,26 @@ export async function setConfig(_data: Record<string, string | number>) {
   }
 }
 
-export async function sendFacebookMessage(recipientId: string, text: string) {
+export async function sendFacebookMessage(text: string, recipientID?: string) {
+  const config = await getConfig();
+
+  if (!config) {
+    console.error("No config found");
+    return { error: "No config found" };
+  }
+
+  const {
+    user_id,
+    notification_messages_token,
+    notification_token_expiry_timestamp,
+  } = config;
+
   const messageData = {
-    recipient: { id: recipientId },
+    recipient: recipientID
+      ? recipientID
+      : validateToken(notification_token_expiry_timestamp)
+      ? { id: user_id }
+      : { notification_messages_token },
     messaging_type: "RESPONSE",
     message: { text: text },
     access_token: PAGE_ACCESS_TOKEN,

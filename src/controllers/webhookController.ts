@@ -59,8 +59,8 @@ export async function webhookCallback(req: Request, res: Response) {
           console.log("UPDATED CONFIG", _configRes);
         } catch (error) {
           await sendFacebookMessage(
-            ONE_TIME_NOTIF_TOKEN,
-            "Error updating config. Please try again later. Error: " + error
+            "Error updating config. Please try again later. Error: " + error,
+            user_id
           );
           console.log("ERROR UPDATING CONFIG", error);
           res.sendStatus(500);
@@ -71,8 +71,8 @@ export async function webhookCallback(req: Request, res: Response) {
 
         // Store in your database for future use
         await sendFacebookMessage(
-          user_id,
-          `Your OTN is: "${updatedConfig?.one_time_notif_token}" and your payload is: "${updatedConfig?.otn_payload}". Please don't share it with anyone!`
+          `Your OTN is: "${updatedConfig?.one_time_notif_token}" and your payload is: "${updatedConfig?.otn_payload}". Please don't share it with anyone!`,
+          user_id
         );
         res.status(200);
         return;
@@ -103,13 +103,13 @@ export async function webhookCallback(req: Request, res: Response) {
           const updatedConfig = await getConfig();
 
           await sendFacebookMessage(
-            webhook_event.sender.id,
-            `Your notification messages token is: "${updatedConfig?.notification_messages_token}"`
+            `Your notification messages token is: "${updatedConfig?.notification_messages_token}"`,
+            webhook_event.sender.id
           );
         } else {
           await sendFacebookMessage(
-            webhook_event.sender.id,
-            "You have stopped receiving notification messages."
+            "You have stopped receiving notification messages.",
+            webhook_event.sender.id
           );
         }
 
@@ -120,11 +120,7 @@ export async function webhookCallback(req: Request, res: Response) {
       return;
     }
 
-    if (USER_ID) {
-      sendFacebookMessage(USER_ID, "Request unkown. Please try again later.");
-      res.sendStatus(200);
-      return;
-    }
+    sendFacebookMessage("Request unkown. Please try again later.");
     res.sendStatus(404);
   } catch (error) {
     console.log("Callback error: ", error);
@@ -139,12 +135,7 @@ export async function smokeDetected(req: Request, res: Response) {
   const config = await getConfig();
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && config) {
-    const { error } = await sendFacebookMessage(
-      validateToken(config.notification_token_expiry_timestamp)
-        ? config.notification_messages_token
-        : config.user_id,
-      text
-    );
+    const { error } = await sendFacebookMessage(text);
     res.status(200).send({
       status: "EVENT_RECEIVED",
       error: error ? error : null,
@@ -210,9 +201,11 @@ export async function sendMessage(req: Request, res: Response) {
       ? config!.user_id
       : body.recipientID === "otn_token"
       ? config!.one_time_notif_token
+      : body.recipientID === "notification_messages_token"
+      ? config!.notification_messages_token
       : body.recipientID;
 
-  const { error } = await sendFacebookMessage(id, body.text);
+  const { error } = await sendFacebookMessage(body.text, id);
   res.status(200).send({
     status: "EVENT_RECEIVED",
     error: error ? error : null,
