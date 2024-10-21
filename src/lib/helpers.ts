@@ -75,7 +75,7 @@ export async function setConfig(_data: Record<string, string | number>) {
 
 export async function sendFacebookMessage(recipientId: string, text: string) {
   const messageData = {
-    recipient: { one_time_notif_token: recipientId },
+    recipient: { id: recipientId },
     messaging_type: "RESPONSE",
     message: { text: text },
     access_token: PAGE_ACCESS_TOKEN,
