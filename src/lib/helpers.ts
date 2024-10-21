@@ -121,7 +121,7 @@ export async function sendFacebookMessage(
   } = config;
 
   const recipient = force_userID
-    ? recipientID
+    ? { id: recipientID }
     : validateToken(notification_token_expiry_timestamp) &&
       notification_messages_token !== ""
     ? { notification_messages_token }
