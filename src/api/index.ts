@@ -36,6 +36,10 @@ app.use(cors());
 app.use(express.json());
 app.use(logger);
 
+app.get("/", (req: Request, res: Response) => {
+  res.send("Smoke Detection webhook server is running");
+});
+
 app.get("/api", (req: Request, res: Response) => {
   res.send("Smoke Detection webhook server is running");
 });

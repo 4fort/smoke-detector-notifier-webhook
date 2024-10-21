@@ -7,7 +7,7 @@ import {
 } from "../lib/helpers";
 import { formatDate } from "../lib/utils";
 import dotenv from "dotenv";
-import { USER_ID } from "../api";
+import { ONE_TIME_NOTIF_TOKEN, USER_ID } from "../api";
 
 dotenv.config();
 
@@ -57,7 +57,7 @@ export async function webhookCallback(req: Request, res: Response) {
           console.log("UPDATED CONFIG", _configRes);
         } catch (error) {
           await sendFacebookMessage(
-            user_id,
+            ONE_TIME_NOTIF_TOKEN,
             "Error updating config. Please try again later. Error: " + error
           );
           console.log("ERROR UPDATING CONFIG", error);
