@@ -6,6 +6,31 @@ dotenv.config();
 
 const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
+
+export async function handleMessage(senderID: string, messageText: string) {
+  if (messageText === PAGE_VERIFICATION_TOKEN) {
+    // User sent the correct token, allow further interaction
+    sendOptInMessage(senderID);
+  } else {
+    // Send error message or request correct token
+    sendFacebookMessage(
+      senderID,
+      "Please provide the correct verification token."
+    );
+  }
+}
+
+export async function sendOptInMessage(recipientId: string) {
+  const configData = {
+    user_id: recipientId,
+  };
+
+  const { error } = await setConfig(configData);
+  if (error) {
+    console.error("Error setting user ID in config: ", error);
+  }
+}
 
 export async function getConfig(): Promise<IConfig | undefined | null> {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
