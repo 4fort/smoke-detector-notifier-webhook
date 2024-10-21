@@ -144,9 +144,9 @@ export async function sendMessage(req: Request, res: Response) {
 
   const config = await getConfig();
   const id =
-    body.reqID === "user_id"
+    body.recipientID === "user_id"
       ? config.USER_ID
-      : body.reqID === "otn_token"
+      : body.recipientID === "otn_token"
       ? config.ONE_TIME_NOTIF_TOKEN
       : body.recipientID;
 
