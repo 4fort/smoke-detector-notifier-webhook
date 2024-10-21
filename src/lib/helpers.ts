@@ -88,10 +88,10 @@ export async function sendFacebookMessage(text: string, recipientID?: string) {
     notification_token_expiry_timestamp,
   } = config;
 
-  const recipient = recipientID
-    ? { id: recipientID }
-    : validateToken(notification_token_expiry_timestamp)
+  const recipient = validateToken(notification_token_expiry_timestamp)
     ? { notification_messages_token }
+    : recipientID
+    ? { id: recipientID }
     : { id: user_id };
 
   const messageData = {
