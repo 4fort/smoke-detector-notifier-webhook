@@ -202,3 +202,9 @@ export async function sendFacebookMessageNotifMsgReq(recipientId: string) {
     return { error: error, response: null };
   }
 }
+
+export function validateToken(timestamp: string) {
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const expiryTimestamp = parseInt(timestamp, 10);
+  return currentTimestamp < expiryTimestamp;
+}

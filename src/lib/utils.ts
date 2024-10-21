@@ -57,3 +57,13 @@ export function statusCodeDecorator(
 
   return { status: statusCode.toString(), emoji };
 }
+
+export function convertTimestamp(fbTimestamp: string) {
+  // Create a new Date object using the timestamp
+  const date = new Date(fbTimestamp);
+
+  // Format the date and time
+  const readableDate = date.toISOString().replace("T", " ").split(".")[0];
+
+  return readableDate;
+}

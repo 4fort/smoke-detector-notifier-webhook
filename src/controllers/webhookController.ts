@@ -5,6 +5,7 @@ import {
   sendFacebookMessageNotifMsgReq,
   sendFacebookMessageTag,
   setConfig,
+  validateToken,
 } from "../lib/helpers";
 import { formatDate } from "../lib/utils";
 import dotenv from "dotenv";
@@ -82,9 +83,11 @@ export async function webhookCallback(req: Request, res: Response) {
         console.log("Received optin", webhook_event);
 
         const _data = {
-          USER_ID: webhook_event.sender.id,
+          user_id: webhook_event.sender.id,
           notification_messages_token:
             webhook_event.optin.notification_messages_token,
+          notification_token_expiry_timestamp:
+            webhook_event.optin.token_expiry_timestamp,
           updated_at: new Date().toUTCString(),
         };
 
@@ -135,7 +138,12 @@ export async function smokeDetected(req: Request, res: Response) {
   const config = await getConfig();
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && config) {
-    const { error } = await sendFacebookMessage(config.USER_ID, text);
+    const { error } = await sendFacebookMessage(
+      validateToken(config.notification_token_expiry_timestamp)
+        ? config.notification_messages_token
+        : config.USER_ID,
+      text
+    );
     res.status(200).send({
       status: "EVENT_RECEIVED",
       error: error ? error : null,
