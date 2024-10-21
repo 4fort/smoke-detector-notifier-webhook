@@ -57,18 +57,13 @@ export async function webhookCallback(req: Request, res: Response) {
         // }
 
         // Store in your database for future use
-        const { error } = await sendFacebookMessage(
+        await sendFacebookMessage(
           webhook_event.sender.id,
-          `Your OTN is: ${otn_token} and your payload is: ${payload}. Please don't share it with anyone!`
+          `Your OTN is: "${otn_token}" and your payload is: "${payload}". Please don't share it with anyone!`
         );
-        res.status(200).send({
-          status: "EVENT_RECEIVED",
-          error: error ? error : null,
-        });
+        res.status(200);
         return;
       }
-
-      console.log(webhook_event);
     });
     res.sendStatus(200);
     return;

@@ -138,6 +138,7 @@ export async function sendFacebookMessage(recipientId: string, text: string) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(messageData),
+        cache: "no-cache",
       }
     );
 
