@@ -63,13 +63,13 @@ export async function setConfig(_data: Record<string, string | number>) {
     const responseBody = await response.text();
     console.log("Response body:", responseBody);
 
+    const data = await response.json();
     if (response.ok) {
-      const data = await response.json();
       console.log("Successfully set config", data);
       return { data, error: null };
     } else {
-      console.error("Error response from server: ", responseBody);
-      return { error: responseBody };
+      console.error("Error response from server: ", data);
+      return { error: data };
     }
   } catch (error) {
     console.error("Error during fetch:", error);
