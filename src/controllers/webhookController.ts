@@ -100,7 +100,7 @@ export async function webhookCallback(req: Request, res: Response) {
 
           await sendFacebookMessage(
             webhook_event.sender.id,
-            `Your notification messages token is: ${updatedConfig.notification_messages_token}`
+            `Your notification messages token is: "${updatedConfig.notification_messages_token}"`
           );
         } else {
           await sendFacebookMessage(
@@ -132,10 +132,10 @@ export async function webhookCallback(req: Request, res: Response) {
 export async function smokeDetected(req: Request, res: Response) {
   const text = "Smoke detected! at " + formatDate(new Date());
   const body = req.body;
-  const otn = await getConfig();
+  const config = await getConfig();
   // Handle ESP32 smoke detection payload
-  if (body.event === "smoke_detected" && otn) {
-    const { error } = await sendFacebookMessage(otn.ONE_TIME_NOTIF_TOKEN, text);
+  if (body.event === "smoke_detected" && config) {
+    const { error } = await sendFacebookMessage(config.USER_ID, text);
     res.status(200).send({
       status: "EVENT_RECEIVED",
       error: error ? error : null,
