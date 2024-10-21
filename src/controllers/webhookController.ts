@@ -7,22 +7,7 @@ import {
 } from "../lib/helpers";
 import { formatDate } from "../lib/utils";
 import dotenv from "dotenv";
-
-export let USER_ID: string;
-export let ONE_TIME_NOTIF_TOKEN: string;
-
-async function setup() {
-  console.log("Setting up...");
-  const data = await getConfig("");
-  USER_ID = data.USER_ID;
-  ONE_TIME_NOTIF_TOKEN = data.ONE_TIME_NOTIF_TOKEN;
-
-  console.log("USER_ID: ", USER_ID);
-  console.log("ONE_TIME_NOTIF_TOKEN: ", ONE_TIME_NOTIF_TOKEN);
-
-  console.log("Setup complete.");
-}
-setup();
+import { USER_ID } from "../api";
 
 dotenv.config();
 
@@ -95,10 +80,6 @@ export async function webhookCallback(req: Request, res: Response) {
 export async function smokeDetected(req: Request, res: Response) {
   const text = "Smoke detected! at " + formatDate(new Date());
   const body = req.body;
-
-  if (!USER_ID) {
-    USER_ID = await getConfig("USER_ID");
-  }
 
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && USER_ID) {

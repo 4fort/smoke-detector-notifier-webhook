@@ -16,6 +16,22 @@ dotenv.config();
 const app: Express = express();
 const PORT = process.env.PORT;
 
+export let USER_ID: string;
+export let ONE_TIME_NOTIF_TOKEN: string;
+
+async function setup() {
+  console.log("Setting up...");
+  const data = await getConfig("");
+  USER_ID = data.USER_ID;
+  ONE_TIME_NOTIF_TOKEN = data.ONE_TIME_NOTIF_TOKEN;
+
+  console.log("USER_ID: ", USER_ID);
+  console.log("ONE_TIME_NOTIF_TOKEN: ", ONE_TIME_NOTIF_TOKEN);
+
+  console.log("Setup complete.");
+}
+setup();
+
 app.use(cors());
 app.use(express.json());
 app.use(logger);

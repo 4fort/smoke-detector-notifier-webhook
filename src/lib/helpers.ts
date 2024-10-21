@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { ONE_TIME_NOTIF_TOKEN } from "../controllers/webhookController";
+import { ONE_TIME_NOTIF_TOKEN } from "../api";
 
 dotenv.config();
 
