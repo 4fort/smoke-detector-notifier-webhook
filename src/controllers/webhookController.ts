@@ -47,9 +47,9 @@ export async function webhookCallback(req: Request, res: Response) {
         console.log("For user:", user_id);
 
         const _data = {
-          USER_ID: user_id,
-          ONE_TIME_NOTIF_TOKEN: otn_token,
-          PAYLOAD: payload,
+          user_id: user_id,
+          one_time_notif_token: otn_token,
+          otn_payload: payload,
           updated_at: new Date().toUTCString(),
         };
 
@@ -107,6 +107,11 @@ export async function webhookCallback(req: Request, res: Response) {
             webhook_event.sender.id
           );
         } else {
+          await setConfig({
+            notification_messages_token: "",
+            updated_at: new Date().toUTCString(),
+            notification_token_expiry_timestamp: "",
+          });
           await sendFacebookMessage(
             "You have stopped receiving notification messages.",
             webhook_event.sender.id
