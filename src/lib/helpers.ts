@@ -165,7 +165,6 @@ export async function sendFacebookMessageNotifMsgReq(recipientId: string) {
           template_type: "notification_messages",
           notification_messages_timezone: "UTC",
           title: "TITLE",
-          image_url: "IMAGE-URL",
           payload: "ADDITIONAL-WEBHOOK-INFORMATION",
         },
       },
