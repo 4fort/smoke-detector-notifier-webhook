@@ -48,8 +48,8 @@ export async function webhookCallback(req: Request, res: Response) {
           ONE_TIME_NOTIF_TOKEN: otn_token,
           PAYLOAD: payload,
         };
-        console.log("UPDATING CONFIG", _data);
-        setConfig(_data);
+        console.log("UPDATING CONFIG", JSON.stringify(_data));
+        await setConfig(_data);
         console.log("UPDATED CONFIG", await getConfig());
 
         // Store in your database for future use

@@ -30,7 +30,6 @@ async function setup() {
 
   console.log("Setup complete.");
 }
-setup();
 
 app.use(cors());
 app.use(express.json());
@@ -50,6 +49,8 @@ app.post("/api/webhook/smoke-detected", smokeDetected);
 app.post("/api/webhook/otn-req", otnRequest);
 
 app.listen(PORT, () => {
+  setup();
+
   console.log(`Server is running at http://localhost:${PORT}`);
 });
 
