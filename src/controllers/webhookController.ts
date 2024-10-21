@@ -65,10 +65,12 @@ export async function webhookCallback(req: Request, res: Response) {
           return;
         }
 
+        const updatedConfig = await getConfig();
+
         // Store in your database for future use
         await sendFacebookMessage(
           user_id,
-          `Your OTN is: "${otn_token}" and your payload is: "${payload}". Please don't share it with anyone!`
+          `Your OTN is: "${updatedConfig.ONE_TIME_NOTIF_TOKEN}" and your payload is: "${updatedConfig.PAYLOAD}". Please don't share it with anyone!`
         );
         res.status(200);
         return;
