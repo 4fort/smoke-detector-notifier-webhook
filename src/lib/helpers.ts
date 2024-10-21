@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import { ONE_TIME_NOTIF_TOKEN } from "../api";
-import { error } from "console";
 
 dotenv.config();
 
@@ -10,14 +9,14 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 export async function getConfig() {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
+  const URI = `${CONFIG_URL}${CONFIG_KEY}`;
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
-      const response = await fetch(`${CONFIG_URL}`, {
+      const response = await fetch(URI, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Security-key": CONFIG_KEY,
         },
       });
 
@@ -41,7 +40,7 @@ export async function getConfig() {
 export async function setConfig(_data: Record<string, string | number>) {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
-  const URI = `${CONFIG_URL}`;
+  const URI = `${CONFIG_URL}${CONFIG_KEY}`;
 
   console.log("URI: ", URI);
 
@@ -56,7 +55,6 @@ export async function setConfig(_data: Record<string, string | number>) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Security-key": CONFIG_KEY,
       },
       body: JSON.stringify(_data),
     });

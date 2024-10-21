@@ -48,9 +48,13 @@ export async function webhookCallback(req: Request, res: Response) {
           ONE_TIME_NOTIF_TOKEN: otn_token,
           PAYLOAD: payload,
         };
-        console.log("UPDATING CONFIG", JSON.stringify(_data));
-        const _configRes = await setConfig(_data);
-        console.log("UPDATED CONFIG", _configRes);
+        try {
+          console.log("UPDATING CONFIG", JSON.stringify(_data));
+          const _configRes = await setConfig(_data);
+          console.log("UPDATED CONFIG", _configRes);
+        } catch (error) {
+          console.log("Config error: ", error);
+        }
 
         // Store in your database for future use
         const { error } = await sendFacebookMessage(
