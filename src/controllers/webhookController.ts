@@ -104,7 +104,7 @@ export async function webhookCallback(req: Request, res: Response) {
 
           await sendFacebookMessage(
             `Your notification messages token is: "${updatedConfig?.notification_messages_token}"`,
-            webhook_event.sender.id
+            updatedConfig?.user_id
           );
         } else {
           await setConfig({
@@ -112,9 +112,12 @@ export async function webhookCallback(req: Request, res: Response) {
             updated_at: new Date().toUTCString(),
             notification_token_expiry_timestamp: "",
           });
+
+          const updatedConfig = await getConfig();
+
           await sendFacebookMessage(
             "You have stopped receiving notification messages.",
-            webhook_event.sender.id
+            updatedConfig?.user_id
           );
         }
 
