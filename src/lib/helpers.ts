@@ -59,10 +59,6 @@ export async function setConfig(_data: Record<string, string | number>) {
       body: JSON.stringify(_data),
     });
 
-    console.log("Response status:", response.status);
-    const responseBody = await response.text();
-    console.log("Response body:", responseBody);
-
     const data = await response.json();
     if (response.ok) {
       console.log("Successfully set config", data);
