@@ -13,10 +13,11 @@ export async function getConfig() {
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
-      const response = await fetch(`${CONFIG_URL}${CONFIG_KEY}`, {
+      const response = await fetch(`${CONFIG_URL}}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          "Security-key": CONFIG_KEY,
         },
       });
 
@@ -40,17 +41,17 @@ export async function getConfig() {
 export async function setConfig(_data: Record<string, string | number>) {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
-  const URI = `${CONFIG_URL}${CONFIG_KEY}`;
+  const URI = `${CONFIG_URL}`;
 
   console.log(URI);
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
-      console.log("Setting config: ", _data);
       const response = await fetch(URI, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Security-key": CONFIG_KEY,
         },
         body: JSON.stringify(_data),
       });
