@@ -156,9 +156,7 @@ export async function sendFacebookMessage(
 
       console.log("Retrying with user_id");
       const _user_id = recipientID ? recipientID : user_id;
-      await sendFacebookMessage(text, _user_id, true);
-
-      return { error: errorBody.error };
+      return await sendFacebookMessage(text, _user_id, true);
     }
 
     console.log("Message sent");
