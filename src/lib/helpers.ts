@@ -54,6 +54,8 @@ export async function setConfig(_data: Record<string, string | number>) {
         body: JSON.stringify(_data),
       });
 
+      console.log("Request: ", response);
+
       const data = await response.json();
       console.log("Response status:", response.status);
       console.log("Response body:", await response.text());
