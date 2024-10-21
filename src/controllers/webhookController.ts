@@ -100,6 +100,16 @@ export async function otnRequest(req: Request, res: Response) {
   const text = "Click below to receive a one-time notification.";
 
   if (!USER_ID) {
+    const data = await getConfig();
+    if (data.USER_ID) {
+      const { error } = await sendFacebookMessageTag(data.USER_ID, text);
+      res.status(200).send({
+        status: "EVENT_RECEIVED",
+        error: error ? error : null,
+      });
+      return;
+    }
+
     res.status(500).send({
       status: "EVENT_RECEIVED",
       error: { message: "User ID is not defined", body: req.body },
