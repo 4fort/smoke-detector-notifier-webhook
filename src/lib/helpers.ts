@@ -13,7 +13,7 @@ export async function getConfig() {
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
-      const response = await fetch(URI, {
+      const response = await fetch(`${CONFIG_URL}${CONFIG_KEY}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
