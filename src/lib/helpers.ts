@@ -43,41 +43,82 @@ export async function setConfig(_data: Record<string, string | number>) {
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
   const URI = `${CONFIG_URL}`;
 
-  console.log(URI);
+  console.log("URI: ", URI);
 
   try {
-    if (CONFIG_URL && CONFIG_KEY) {
-      const response = await fetch(URI, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Security-key": CONFIG_KEY,
-        },
-        body: JSON.stringify(_data),
-      });
+    if (!CONFIG_URL || !CONFIG_KEY) {
+      throw new Error("Missing CONFIG_URL or CONFIG_KEY");
+    }
 
-      console.log("Request: ", response);
+    console.log("Setting config: ", _data);
 
+    const response = await fetch(URI, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Security-key": CONFIG_KEY,
+      },
+      body: JSON.stringify(_data),
+    });
+
+    console.log("Response status:", response.status);
+    const responseBody = await response.text();
+    console.log("Response body:", responseBody);
+
+    if (response.ok) {
       const data = await response.json();
-      console.log("Response status:", response.status);
-      console.log("Response body:", await response.text());
-
-      if (response.ok) {
-        console.log("Successfully set config", data);
-        return { data, error: null };
-      } else {
-        console.error("Error setting config: ", response);
-        return { error: data };
-      }
+      console.log("Successfully set config", data);
+      return { data, error: null };
     } else {
-      console.error("Missing configuration URL or key");
-      return { error: "Missing configuration URL or key" };
+      console.error("Error response from server: ", responseBody);
+      return { error: responseBody };
     }
   } catch (error) {
-    console.error("Error fetching config: ", error);
+    console.error("Error during fetch:", error);
     return { error };
   }
 }
+
+// export async function setConfig(_data: Record<string, string | number>) {
+//   const CONFIG_URL = process.env.CONFIGURATION_URL;
+//   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
+//   const URI = `${CONFIG_URL}`;
+
+//   console.log(URI);
+
+//   try {
+//     if (CONFIG_URL && CONFIG_KEY) {
+//       const response = await fetch(URI, {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Security-key": CONFIG_KEY,
+//         },
+//         body: JSON.stringify(_data),
+//       });
+
+//       console.log("Request: ", response);
+
+//       const data = await response.json();
+//       console.log("Response status:", response.status);
+//       console.log("Response body:", await response.text());
+
+//       if (response.ok) {
+//         console.log("Successfully set config", data);
+//         return { data, error: null };
+//       } else {
+//         console.error("Error setting config: ", response);
+//         return { error: data };
+//       }
+//     } else {
+//       console.error("Missing configuration URL or key");
+//       return { error: "Missing configuration URL or key" };
+//     }
+//   } catch (error) {
+//     console.error("Error fetching config: ", error);
+//     return { error };
+//   }
+// }
 
 export async function sendFacebookMessage(recipientId: string, text: string) {
   const messageData = {
