@@ -6,7 +6,7 @@ dotenv.config();
 const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
-export async function getConfig(key: string) {
+export async function getConfig() {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
 
@@ -24,11 +24,7 @@ export async function getConfig(key: string) {
 
         console.log("Config Data: ", data);
 
-        if (key == "") {
-          return data;
-        }
-
-        return data[key];
+        return data;
       } else {
         console.error("Error fetching user ID from config: ", response);
         return null;
