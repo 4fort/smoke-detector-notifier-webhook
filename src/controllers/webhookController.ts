@@ -49,8 +49,8 @@ export async function webhookCallback(req: Request, res: Response) {
           PAYLOAD: payload,
         };
         console.log("UPDATING CONFIG", JSON.stringify(_data));
-        await setConfig(_data);
-        console.log("UPDATED CONFIG", await getConfig());
+        const _configRes = await setConfig(_data);
+        console.log("UPDATED CONFIG", _configRes);
 
         // Store in your database for future use
         const { error } = await sendFacebookMessage(

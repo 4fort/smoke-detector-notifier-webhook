@@ -60,7 +60,7 @@ export async function setConfig(_data: Record<string, string | number>) {
 
       if (response.ok) {
         console.log("Successfully set config", data);
-        return data;
+        return { data, error: null };
       } else {
         console.error("Error setting config: ", response);
         return { error: data };
