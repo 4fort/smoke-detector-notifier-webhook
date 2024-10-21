@@ -164,8 +164,9 @@ export async function sendFacebookMessageNotifMsgReq(recipientId: string) {
         payload: {
           template_type: "notification_messages",
           notification_messages_timezone: "UTC",
-          title: "TITLE",
+          title: "Get notified when smoke is detected",
           payload: "ADDITIONAL-WEBHOOK-INFORMATION",
+          notification_messages_cta_text: "ALLOW",
         },
       },
     },

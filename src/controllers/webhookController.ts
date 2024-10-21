@@ -75,6 +75,8 @@ export async function webhookCallback(req: Request, res: Response) {
         );
         res.status(200);
         return;
+      } else if (webhook_event.optin && webhook_event.optin.recipient) {
+        console.log("Received optin", webhook_event);
       }
       res.sendStatus(200);
       return;
