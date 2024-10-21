@@ -55,9 +55,12 @@ export async function webhookCallback(req: Request, res: Response) {
         console.log("For user:", user_id);
 
         console.log("UPDATING CONFIG");
-        setConfig("USER_ID", user_id);
-        setConfig("ONE_TIME_NOTIF_TOKEN", otn_token);
-        setConfig("PAYLOAD", payload);
+        const _data = {
+          USER_ID: user_id,
+          ONE_TIME_NOTIF_TOKEN: otn_token,
+          PAYLOAD: payload,
+        };
+        setConfig(_data);
         console.log("UPDATED CONFIG", getConfig(""));
 
         // Store in your database for future use

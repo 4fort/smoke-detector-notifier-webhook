@@ -12,11 +12,10 @@ export async function getConfig(key: string) {
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
-      const response = await fetch(CONFIG_URL, {
+      const response = await fetch(`${CONFIG_URL}${CONFIG_KEY}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "X-SILO-KEY": CONFIG_KEY,
         },
       });
 
@@ -38,24 +37,22 @@ export async function getConfig(key: string) {
   }
 }
 
-export async function setConfig(key: string, value: string) {
+export async function setConfig(_data: Record<string, string | number>) {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
-      const response = await fetch(CONFIG_URL, {
-        method: "POST",
+      const response = await fetch(`${CONFIG_URL}${CONFIG_KEY}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-SILO-KEY": CONFIG_KEY,
         },
-        body: JSON.stringify({ [key]: value }),
+        body: JSON.stringify(_data),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        return data[key];
+        return await response.json();
       }
     }
   } catch (error) {
