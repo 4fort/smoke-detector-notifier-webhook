@@ -121,7 +121,7 @@ export async function sendFacebookMessage(
   } = config;
 
   const recipient = force_userID
-    ? { id: user_id }
+    ? recipientID
     : validateToken(notification_token_expiry_timestamp) &&
       notification_messages_token !== ""
     ? { notification_messages_token }
@@ -155,7 +155,7 @@ export async function sendFacebookMessage(
       console.error("Unable to send message:", errorBody.error);
 
       console.log("Retrying with user_id");
-      const _user_id = recipientID ? recipientID : recipient.id;
+      const _user_id = recipientID ? recipientID : user_id;
       return await sendFacebookMessage(text, _user_id, true);
     }
 
