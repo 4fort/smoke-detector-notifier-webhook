@@ -31,40 +31,39 @@ export async function webhookCallback(req: Request, res: Response) {
   const body = req.body;
   console.log(body);
   if (body.object === "page") {
-    body.entry.forEach(async (entry: any) => {
-      const webhook_event = entry.messaging[0];
+    const entry = body.entry[0];
+    const webhook_event = entry.messaging[0];
 
-      if (webhook_event.optin && webhook_event.optin.one_time_notif_token) {
-        const otn_token = webhook_event.optin.one_time_notif_token;
-        const user_id = webhook_event.sender.id;
-        const payload = webhook_event.optin.payload;
+    if (webhook_event.optin && webhook_event.optin.one_time_notif_token) {
+      const otn_token = webhook_event.optin.one_time_notif_token;
+      const user_id = webhook_event.sender.id;
+      const payload = webhook_event.optin.payload;
 
-        // Log or store the OTN token along with the user ID
-        console.log("Received OTN Token:", otn_token);
-        console.log("For user:", user_id);
+      // Log or store the OTN token along with the user ID
+      console.log("Received OTN Token:", otn_token);
+      console.log("For user:", user_id);
 
-        const _data = {
-          USER_ID: user_id,
-          ONE_TIME_NOTIF_TOKEN: otn_token,
-          PAYLOAD: payload,
-        };
-        // try {
-        //   console.log("UPDATING CONFIG", JSON.stringify(_data));
-        //   const _configRes = await setConfig(_data);
-        //   console.log("UPDATED CONFIG", _configRes);
-        // } catch (error) {
-        //   console.log("Config error: ", error);
-        // }
+      const _data = {
+        USER_ID: user_id,
+        ONE_TIME_NOTIF_TOKEN: otn_token,
+        PAYLOAD: payload,
+      };
+      // try {
+      //   console.log("UPDATING CONFIG", JSON.stringify(_data));
+      //   const _configRes = await setConfig(_data);
+      //   console.log("UPDATED CONFIG", _configRes);
+      // } catch (error) {
+      //   console.log("Config error: ", error);
+      // }
 
-        // Store in your database for future use
-        await sendFacebookMessage(
-          webhook_event.sender.id,
-          `Your OTN is: "${otn_token}" and your payload is: "${payload}". Please don't share it with anyone!`
-        );
-        res.status(200);
-        return;
-      }
-    });
+      // Store in your database for future use
+      await sendFacebookMessage(
+        webhook_event.sender.id,
+        `Your OTN is: "${otn_token}" and your payload is: "${payload}". Please don't share it with anyone!`
+      );
+      res.status(200);
+      return;
+    }
     res.sendStatus(200);
     return;
   }
