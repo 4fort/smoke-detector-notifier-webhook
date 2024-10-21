@@ -47,6 +47,7 @@ export async function webhookCallback(req: Request, res: Response) {
         USER_ID: user_id,
         ONE_TIME_NOTIF_TOKEN: otn_token,
         PAYLOAD: payload,
+        updated_at: new Date().toUTCString(),
       };
       console.log("UPDATING CONFIG", JSON.stringify(_data));
       const _configRes = await setConfig(_data);
