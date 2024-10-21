@@ -10,10 +10,12 @@ const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 
 export async function handleMessage(senderID: string, messageText: string) {
   if (messageText === PAGE_VERIFICATION_TOKEN) {
-    // User sent the correct token, allow further interaction
     sendOptInMessage(senderID);
+    sendFacebookMessage(
+      senderID,
+      "You entered the correct verification token."
+    );
   } else {
-    // Send error message or request correct token
     sendFacebookMessage(
       senderID,
       "Please provide the correct verification token."
