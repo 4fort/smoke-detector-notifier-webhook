@@ -15,7 +15,8 @@ export async function handleMessage(senderID: string, messageText: string) {
       "You entered the correct verification token.",
       senderID
     );
-    // await sendFacebookMessageNotifMsgReq(senderID);
+    await sendFacebookMessageNotifMsgReq(senderID);
+    return;
   }
 
   await sendFacebookMessage(
