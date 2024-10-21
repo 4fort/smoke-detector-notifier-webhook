@@ -52,7 +52,7 @@ export async function setConfig(_data: Record<string, string | number>) {
     console.log("Setting config: ", _data);
 
     const response = await fetch(URI, {
-      method: "PUT",
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },

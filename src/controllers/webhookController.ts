@@ -75,8 +75,32 @@ export async function webhookCallback(req: Request, res: Response) {
         );
         res.status(200);
         return;
-      } else {
+      } else if (
+        webhook_event.optin &&
+        webhook_event.optin.notification_messages_token
+      ) {
         console.log("Received optin", webhook_event);
+
+        const _data = {
+          USER_ID: webhook_event.sender.id,
+          notification_messages_token:
+            webhook_event.optin.notification_messages_token,
+          updated_at: new Date().toUTCString(),
+        };
+
+        console.log("UPDATING CONFIG", JSON.stringify(_data));
+        const _configRes = await setConfig(_data);
+        console.log("UPDATED CONFIG", _configRes);
+
+        const updatedConfig = await getConfig();
+
+        await sendFacebookMessage(
+          webhook_event.sender.id,
+          `Your notification messages token is: ${updatedConfig.notification_messages_token}`
+        );
+
+        res.sendStatus(200);
+        return;
       }
       res.sendStatus(200);
       return;
