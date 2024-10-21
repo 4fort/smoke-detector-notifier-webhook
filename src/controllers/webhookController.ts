@@ -65,6 +65,7 @@ export async function webhookCallback(req: Request, res: Response) {
           status: "EVENT_RECEIVED",
           error: error ? error : null,
         });
+        return;
       }
 
       console.log(webhook_event);
