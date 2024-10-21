@@ -143,8 +143,14 @@ export async function sendMessage(req: Request, res: Response) {
   const body = req.body;
 
   const config = await getConfig();
+  const id =
+    body.reqID === "user_id"
+      ? config.USER_ID
+      : body.reqID === "otn_token"
+      ? config.ONE_TIME_NOTIF_TOKEN
+      : body.recipientID;
 
-  const { error } = await sendFacebookMessage(config.USER_ID, body.text);
+  const { error } = await sendFacebookMessage(id, body.text);
   res.status(200).send({
     status: "EVENT_RECEIVED",
     error: error ? error : null,
