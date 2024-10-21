@@ -1,12 +1,13 @@
 import dotenv from "dotenv";
 import { ONE_TIME_NOTIF_TOKEN } from "../api";
+import IConfig from "../types/config";
 
 dotenv.config();
 
 const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
-export async function getConfig() {
+export async function getConfig(): Promise<IConfig | undefined | null> {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
   const URI = `${CONFIG_URL}${CONFIG_KEY}`;
@@ -21,7 +22,7 @@ export async function getConfig() {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: IConfig = await response.json();
 
         console.log("Config Data: ", data);
 

@@ -72,7 +72,7 @@ export async function webhookCallback(req: Request, res: Response) {
         // Store in your database for future use
         await sendFacebookMessage(
           user_id,
-          `Your OTN is: "${updatedConfig.ONE_TIME_NOTIF_TOKEN}" and your payload is: "${updatedConfig.PAYLOAD}". Please don't share it with anyone!`
+          `Your OTN is: "${updatedConfig?.one_time_notif_token}" and your payload is: "${updatedConfig?.otn_payload}". Please don't share it with anyone!`
         );
         res.status(200);
         return;
@@ -86,6 +86,7 @@ export async function webhookCallback(req: Request, res: Response) {
           user_id: webhook_event.sender.id,
           notification_messages_token:
             webhook_event.optin.notification_messages_token,
+          nmt_payload: webhook_event.optin.payload,
           notification_token_expiry_timestamp:
             webhook_event.optin.token_expiry_timestamp,
           updated_at: new Date().toUTCString(),
@@ -103,7 +104,7 @@ export async function webhookCallback(req: Request, res: Response) {
 
           await sendFacebookMessage(
             webhook_event.sender.id,
-            `Your notification messages token is: "${updatedConfig.notification_messages_token}"`
+            `Your notification messages token is: "${updatedConfig?.notification_messages_token}"`
           );
         } else {
           await sendFacebookMessage(
@@ -141,7 +142,7 @@ export async function smokeDetected(req: Request, res: Response) {
     const { error } = await sendFacebookMessage(
       validateToken(config.notification_token_expiry_timestamp)
         ? config.notification_messages_token
-        : config.USER_ID,
+        : config.user_id,
       text
     );
     res.status(200).send({
@@ -161,8 +162,8 @@ export async function otnRequest(req: Request, res: Response) {
 
   if (!USER_ID) {
     const data = await getConfig();
-    if (data.USER_ID) {
-      const { error } = await sendFacebookMessageTag(data.USER_ID, text);
+    if (data && data.user_id) {
+      const { error } = await sendFacebookMessageTag(data?.user_id, text);
       res.status(200).send({
         status: "EVENT_RECEIVED",
         error: error ? error : null,
@@ -186,7 +187,7 @@ export async function otnRequest(req: Request, res: Response) {
 
 export async function notifMsgRequest(req: Request, res: Response) {
   const config = await getConfig();
-  const id = config.USER_ID;
+  const id = config!.user_id;
 
   const { error, response } = await sendFacebookMessageNotifMsgReq(id);
   if (!error && response) {
@@ -206,9 +207,9 @@ export async function sendMessage(req: Request, res: Response) {
   const config = await getConfig();
   const id =
     body.recipientID === "user_id"
-      ? config.USER_ID
+      ? config!.user_id
       : body.recipientID === "otn_token"
-      ? config.ONE_TIME_NOTIF_TOKEN
+      ? config!.one_time_notif_token
       : body.recipientID;
 
   const { error } = await sendFacebookMessage(id, body.text);

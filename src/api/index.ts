@@ -24,8 +24,8 @@ export let ONE_TIME_NOTIF_TOKEN: string;
 async function setup() {
   console.log("Setting up...");
   const data = await getConfig();
-  USER_ID = data.USER_ID;
-  ONE_TIME_NOTIF_TOKEN = data.ONE_TIME_NOTIF_TOKEN;
+  USER_ID = data!.user_id;
+  ONE_TIME_NOTIF_TOKEN = data!.one_time_notif_token;
 
   console.log("USER_ID: ", USER_ID);
   console.log("ONE_TIME_NOTIF_TOKEN: ", ONE_TIME_NOTIF_TOKEN);
