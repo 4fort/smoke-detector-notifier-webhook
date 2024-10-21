@@ -125,6 +125,7 @@ export async function webhookCallback(req: Request, res: Response) {
         res.sendStatus(200);
         return;
       } else if (webhook_event.message && webhook_event.sender.id) {
+        console.log("Received message", webhook_event);
         handleMessage(webhook_event.sender.id, webhook_event.message.text);
 
         res.sendStatus(200);
