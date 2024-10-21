@@ -30,47 +30,64 @@ export function verifyToken(req: Request, res: Response) {
 export async function webhookCallback(req: Request, res: Response) {
   const body = req.body;
   console.log(body);
-  if (body.object === "page") {
-    const entry = body.entry[0];
-    const webhook_event = entry.messaging[0];
+  try {
+    if (body.object === "page") {
+      const entry = body.entry[0];
+      const webhook_event = entry.messaging[0];
 
-    if (webhook_event.optin && webhook_event.optin.one_time_notif_token) {
-      const otn_token = webhook_event.optin.one_time_notif_token;
-      const user_id = webhook_event.sender.id;
-      const payload = webhook_event.optin.payload;
+      if (webhook_event.optin && webhook_event.optin.one_time_notif_token) {
+        const otn_token = webhook_event.optin.one_time_notif_token;
+        const user_id = webhook_event.sender.id;
+        const payload = webhook_event.optin.payload;
 
-      // Log or store the OTN token along with the user ID
-      console.log("Received OTN Token:", otn_token);
-      console.log("For user:", user_id);
+        // Log or store the OTN token along with the user ID
+        console.log("Received OTN Token:", otn_token);
+        console.log("For user:", user_id);
 
-      const _data = {
-        USER_ID: user_id,
-        ONE_TIME_NOTIF_TOKEN: otn_token,
-        PAYLOAD: payload,
-        updated_at: new Date().toUTCString(),
-      };
-      console.log("UPDATING CONFIG", JSON.stringify(_data));
-      const _configRes = await setConfig(_data);
-      console.log("UPDATED CONFIG", _configRes);
+        const _data = {
+          USER_ID: user_id,
+          ONE_TIME_NOTIF_TOKEN: otn_token,
+          PAYLOAD: payload,
+          updated_at: new Date().toUTCString(),
+        };
 
-      // Store in your database for future use
-      await sendFacebookMessage(
-        webhook_event.sender.id,
-        `Your OTN is: "${otn_token}" and your payload is: "${payload}". Please don't share it with anyone!`
-      );
-      res.status(200);
+        try {
+          console.log("UPDATING CONFIG", JSON.stringify(_data));
+          const _configRes = await setConfig(_data);
+          console.log("UPDATED CONFIG", _configRes);
+        } catch (error) {
+          await sendFacebookMessage(
+            user_id,
+            "Error updating config. Please try again later. Error: " + error
+          );
+          console.log("ERROR UPDATING CONFIG", error);
+          res.sendStatus(500);
+          return;
+        }
+
+        // Store in your database for future use
+        await sendFacebookMessage(
+          user_id,
+          `Your OTN is: "${otn_token}" and your payload is: "${payload}". Please don't share it with anyone!`
+        );
+        res.status(200);
+        return;
+      }
+      res.sendStatus(200);
       return;
     }
-    res.sendStatus(200);
-    return;
-  }
 
-  if (USER_ID) {
-    sendFacebookMessage(USER_ID, "Request unkown. Please try again later.");
-    res.sendStatus(200);
+    if (USER_ID) {
+      sendFacebookMessage(USER_ID, "Request unkown. Please try again later.");
+      res.sendStatus(200);
+      return;
+    }
+    res.sendStatus(404);
+  } catch (error) {
+    console.log("Callback error: ", error);
+    res.sendStatus(500);
     return;
   }
-  res.sendStatus(404);
 }
 
 export async function smokeDetected(req: Request, res: Response) {

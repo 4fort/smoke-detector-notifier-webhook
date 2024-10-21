@@ -42,7 +42,7 @@ export async function setConfig(_data: Record<string, string | number>) {
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
   const URI = `${CONFIG_URL}${CONFIG_KEY}`;
 
-  console.log("URI: ", URI);
+  // console.log("URI: ", URI);
 
   try {
     if (!CONFIG_URL || !CONFIG_KEY) {
