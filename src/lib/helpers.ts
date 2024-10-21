@@ -102,7 +102,11 @@ export async function setConfig(_data: Record<string, string | number>) {
   }
 }
 
-export async function sendFacebookMessage(text: string, recipientID?: string) {
+export async function sendFacebookMessage(
+  text: string,
+  recipientID?: string,
+  force_userID = false
+) {
   const config = await getConfig();
 
   if (!config) {
@@ -116,13 +120,14 @@ export async function sendFacebookMessage(text: string, recipientID?: string) {
     notification_token_expiry_timestamp,
   } = config;
 
-  const recipient =
-    validateToken(notification_token_expiry_timestamp) &&
-    notification_messages_token !== ""
-      ? { notification_messages_token }
-      : recipientID
-      ? { id: recipientID }
-      : { id: user_id };
+  const recipient = force_userID
+    ? { id: user_id }
+    : validateToken(notification_token_expiry_timestamp) &&
+      notification_messages_token !== ""
+    ? { notification_messages_token }
+    : recipientID
+    ? { id: recipientID }
+    : { id: user_id };
 
   const messageData = {
     recipient,
@@ -148,6 +153,11 @@ export async function sendFacebookMessage(text: string, recipientID?: string) {
     if (!response.ok) {
       const errorBody = await response.json();
       console.error("Unable to send message:", errorBody.error);
+
+      console.log("Retrying with user_id");
+      const _user_id = recipientID ? recipientID : user_id;
+      await sendFacebookMessage(text, _user_id, true);
+
       return { error: errorBody.error };
     }
 
