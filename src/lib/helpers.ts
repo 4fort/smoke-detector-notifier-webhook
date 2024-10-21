@@ -46,6 +46,7 @@ export async function setConfig(_data: Record<string, string | number>) {
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
+      console.log("Setting config: ", _data);
       const response = await fetch(URI, {
         method: "PUT",
         headers: {
