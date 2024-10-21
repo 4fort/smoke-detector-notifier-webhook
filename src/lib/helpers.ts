@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { ONE_TIME_NOTIF_TOKEN } from "../api";
+import { error } from "console";
 
 dotenv.config();
 
@@ -50,16 +51,18 @@ export async function setConfig(_data: Record<string, string | number>) {
         body: JSON.stringify(_data),
       });
 
+      const data = await response.json();
       if (response.ok) {
-        return await response.json();
+        console.log("Successfully set config", data);
+        return data;
       } else {
-        console.error("Error fetching config: ", response);
-        return null;
+        console.error("Error setting config: ", response);
+        return { error: data };
       }
     }
   } catch (error) {
-    console.error("Error fetching user ID from config: ", error);
-    return null;
+    console.error("Error fetching config: ", error);
+    return { error };
   }
 }
 

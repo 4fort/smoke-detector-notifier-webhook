@@ -43,12 +43,12 @@ export async function webhookCallback(req: Request, res: Response) {
         console.log("Received OTN Token:", otn_token);
         console.log("For user:", user_id);
 
-        console.log("UPDATING CONFIG");
         const _data = {
           USER_ID: user_id,
           ONE_TIME_NOTIF_TOKEN: otn_token,
           PAYLOAD: payload,
         };
+        console.log("UPDATING CONFIG", _data);
         setConfig(_data);
         console.log("UPDATED CONFIG", await getConfig());
 
