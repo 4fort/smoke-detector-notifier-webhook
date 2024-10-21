@@ -126,6 +126,8 @@ export async function webhookCallback(req: Request, res: Response) {
         return;
       } else if (webhook_event.message && webhook_event.sender.id) {
         handleMessage(webhook_event.sender.id, webhook_event.message.text);
+        res.sendStatus(200);
+        return;
       }
       res.sendStatus(200);
       return;
