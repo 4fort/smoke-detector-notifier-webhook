@@ -40,10 +40,13 @@ export async function getConfig() {
 export async function setConfig(_data: Record<string, string | number>) {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
+  const URI = `${CONFIG_URL}${CONFIG_KEY}`;
+
+  console.log(URI);
 
   try {
     if (CONFIG_URL && CONFIG_KEY) {
-      const response = await fetch(`${CONFIG_URL}${CONFIG_KEY}`, {
+      const response = await fetch(URI, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -52,6 +55,9 @@ export async function setConfig(_data: Record<string, string | number>) {
       });
 
       const data = await response.json();
+      console.log("Response status:", response.status);
+      console.log("Response body:", await response.text());
+
       if (response.ok) {
         console.log("Successfully set config", data);
         return data;
