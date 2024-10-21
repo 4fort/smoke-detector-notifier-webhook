@@ -114,7 +114,7 @@ export async function sendFacebookMessageTag(
   text: string
 ) {
   const messageData = {
-    recipient: { id: recipientId },
+    recipient: { one_time_notif_token: recipientId },
     message: {
       attachment: {
         type: "template",
