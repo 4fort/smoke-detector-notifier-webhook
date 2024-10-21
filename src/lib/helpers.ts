@@ -59,6 +59,9 @@ export async function setConfig(_data: Record<string, string | number>) {
         console.error("Error setting config: ", response);
         return { error: data };
       }
+    } else {
+      console.error("Missing configuration URL or key");
+      return { error: "Missing configuration URL or key" };
     }
   } catch (error) {
     console.error("Error fetching config: ", error);
