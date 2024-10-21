@@ -9,21 +9,18 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 
 export async function handleMessage(senderID: string, messageText: string) {
-  console.log(
-    "Handling message for: " + senderID + " with message: " + messageText
-  );
   if (messageText === PAGE_VERIFICATION_TOKEN) {
     sendOptInMessage(senderID);
-    sendFacebookMessage(
+    await sendFacebookMessage(
       senderID,
       "You entered the correct verification token."
     );
-  } else {
-    sendFacebookMessage(
-      senderID,
-      "Please provide the correct verification token."
-    );
   }
+
+  await sendFacebookMessage(
+    senderID,
+    "Please provide the correct verification token."
+  );
 }
 
 export async function sendOptInMessage(recipientId: string) {

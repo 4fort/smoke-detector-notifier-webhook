@@ -139,7 +139,7 @@ export async function webhookCallback(req: Request, res: Response) {
       return;
     }
 
-    sendFacebookMessage("Request unkown. Please try again later.");
+    await sendFacebookMessage("Request unkown. Please try again later.");
     res.sendStatus(404);
   } catch (error) {
     console.log("Callback error: ", error);
