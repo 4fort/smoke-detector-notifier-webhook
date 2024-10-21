@@ -88,16 +88,26 @@ export async function webhookCallback(req: Request, res: Response) {
           updated_at: new Date().toUTCString(),
         };
 
-        console.log("UPDATING CONFIG", JSON.stringify(_data));
-        const _configRes = await setConfig(_data);
-        console.log("UPDATED CONFIG", _configRes);
+        if (
+          webhook_event.optin.notification_messages_status !==
+          "STOP_NOTIFICATIONS"
+        ) {
+          console.log("UPDATING CONFIG", JSON.stringify(_data));
+          const _configRes = await setConfig(_data);
+          console.log("UPDATED CONFIG", _configRes);
 
-        const updatedConfig = await getConfig();
+          const updatedConfig = await getConfig();
 
-        await sendFacebookMessage(
-          webhook_event.sender.id,
-          `Your notification messages token is: ${updatedConfig.notification_messages_token}`
-        );
+          await sendFacebookMessage(
+            webhook_event.sender.id,
+            `Your notification messages token is: ${updatedConfig.notification_messages_token}`
+          );
+        } else {
+          await sendFacebookMessage(
+            webhook_event.sender.id,
+            "You have stopped receiving notification messages."
+          );
+        }
 
         res.sendStatus(200);
         return;
