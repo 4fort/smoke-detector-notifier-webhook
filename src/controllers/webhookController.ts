@@ -130,7 +130,10 @@ export async function otnRequest(req: Request, res: Response) {
 
 export async function sendMessage(req: Request, res: Response) {
   const body = req.body;
-  const { error } = await sendFacebookMessage(USER_ID, body.text);
+
+  const config = await getConfig();
+
+  const { error } = await sendFacebookMessage(config.USER_ID, body.text);
   res.status(200).send({
     status: "EVENT_RECEIVED",
     error: error ? error : null,
