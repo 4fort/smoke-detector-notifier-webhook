@@ -33,7 +33,11 @@ export async function handleMessage(senderID: string, messageText: string) {
       senderID,
       true
     );
-    return await sendOptInMessage(senderID);
+    await sendFacebookMessage(
+      "Your account has been unbound from receiving alerts of smoke detection.",
+      config.user_id
+    );
+    await sendOptInMessage(senderID);
   }
   if (config.user_id === senderID) {
     // Make a sendQuickReply() function where user can pick between ""
