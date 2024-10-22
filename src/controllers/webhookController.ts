@@ -44,9 +44,11 @@ export async function webhookCallback(req: Request, res: Response) {
         const { error } = await setConfig(newConfig);
         if (error) {
           console.error("Error creating new config", error);
+          res.sendStatus(500);
           return;
         }
         console.log("Try again");
+        res.sendStatus(500);
         return;
       }
 
@@ -90,6 +92,7 @@ export async function webhookCallback(req: Request, res: Response) {
           const updatedConfig = await getConfig();
           if (!updatedConfig) {
             console.error("No config found");
+            res.sendStatus(500);
             return;
           }
 
@@ -100,15 +103,18 @@ export async function webhookCallback(req: Request, res: Response) {
 
           if (!userConfig) {
             console.error("No user found");
+            res.sendStatus(500);
             return;
           }
 
-          if (userConfig.notification_messages) {
+          if (!userConfig.notification_messages) {
             await sendFacebookMessage(
               "You need to allow messages to receive further alerts.",
               webhook_event.sender.id
             );
             await sendFacebookMessageNotifMsgReq(webhook_event.sender.id);
+
+            res.sendStatus(200);
             return;
           }
 
