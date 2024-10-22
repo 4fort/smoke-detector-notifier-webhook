@@ -9,13 +9,28 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 
 export async function handleMessage(senderID: string, messageText: string) {
-  if (messageText === PAGE_VERIFICATION_TOKEN) {
-    sendOptInMessage(senderID);
+  const config = await getConfig();
+  if (!config) {
+    console.error("No config found");
+    return;
+  }
+
+  if (config.user_id === senderID) {
+    if (messageText === PAGE_VERIFICATION_TOKEN) {
+      await sendFacebookMessage(
+        "You entered the correct verification token.",
+        senderID
+      );
+      await sendOptInMessage(senderID);
+
+      return;
+    }
+
+    // Make a sendQuickReply() function where user can pick between ""
     await sendFacebookMessage(
-      "You entered the correct verification token.",
+      "You are already receiving alerts of smoke detection.",
       senderID
     );
-    await sendFacebookMessageNotifMsgReq(senderID);
     return;
   }
 
@@ -33,7 +48,11 @@ export async function sendOptInMessage(recipientId: string) {
   const { error } = await setConfig(configData);
   if (error) {
     console.error("Error setting user ID in config: ", error);
+    return;
   }
+
+  await sendFacebookMessageNotifMsgReq(recipientId);
+  return;
 }
 
 export async function getConfig(): Promise<IConfig | undefined | null> {
@@ -223,7 +242,7 @@ export async function sendFacebookMessageNotifMsgReq(recipientId: string) {
         payload: {
           template_type: "notification_messages",
           notification_messages_timezone: "UTC",
-          title: "Get notified when smoke is detected",
+          title: "Allow notifications to receive smoke detection alerts.",
           payload: "ADDITIONAL-WEBHOOK-INFORMATION",
           notification_messages_cta_text: "ALLOW",
         },
