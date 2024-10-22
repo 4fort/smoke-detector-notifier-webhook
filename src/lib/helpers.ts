@@ -16,6 +16,7 @@ async function promptUserIsAlreadyOptedIn(senderID: string) {
 }
 
 export async function handleMessage(senderID: string, messageText: string) {
+  const delay = 500;
   const config = await getConfig();
   if (!config) {
     console.error("No config found");
@@ -32,7 +33,9 @@ export async function handleMessage(senderID: string, messageText: string) {
       "You entered the correct verification token.",
       senderID
     );
-    await sendOptInMessage(senderID);
+    setTimeout(async () => {
+      return await sendOptInMessage(senderID);
+    }, delay);
     return;
   }
   if (config.user_id === senderID) {
