@@ -5,6 +5,8 @@ import {
   getUserByID,
   getUserRecipientID,
 } from "./utils";
+import Config from "../models/Config";
+import FacebookAPI from "../models/FacebookAPI";
 
 dotenv.config();
 
@@ -15,89 +17,85 @@ const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 export async function handleMessage(
   senderID: string,
   messageText: string,
-  config: IConfig
+  config: Config
 ) {
-  const userConfig = getUserByID(config.users, senderID);
+  const userConfig = config.getUserByID(senderID);
   if (!userConfig) {
     console.error("User not found in config");
   }
 
   if (messageText === PAGE_VERIFICATION_TOKEN) {
     console.log("User entered verification token: ", messageText);
-    if (
-      userConfig &&
-      userConfig.notification_messages &&
-      userConfig.notification_messages.token
-    ) {
+    if (userConfig && config.validateUserNotificationMessages(userConfig)) {
       await promptUserIsAlreadyOptedIn(senderID);
       return;
     }
 
-    await sendFacebookMessage(
+    await FacebookAPI.sendMessage(
       "You entered the correct verification token.",
+      config,
       senderID,
       true
     );
+    // TODO: create a function that update the specific users token
     await sendOptInMessage(senderID, config);
     return;
   }
 
   // Make a sendQuickReply() function where user can pick between "Refresh" and "Unbind"
-  if (
-    userConfig &&
-    userConfig.notification_messages &&
-    userConfig.notification_messages.token
-  ) {
+  if (userConfig && config.validateUserNotificationMessages(userConfig)) {
     await promptUserIsAlreadyOptedIn(senderID);
     return;
   }
 
-  await sendFacebookMessage(
+  await FacebookAPI.sendMessage(
     "Please provide the correct verification token to receive alerts.",
-    senderID
+    config,
+    senderID,
+    true
   );
   return;
 }
 
-export async function sendOptInMessage(senderID: string, config: IConfig) {
-  const updatedConfig = getUserByID(config.users, senderID)
-    ? {
-        ...config,
-        users: config.users.map((user) =>
-          user.id === senderID
-            ? {
-                ...user,
-                updated_at: new Date().toISOString(),
-              }
-            : user
-        ),
-        updated_at: new Date().toISOString(),
-      }
-    : {
-        ...config,
-        users: [
-          ...config.users,
-          {
-            id: senderID,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ],
-        updated_at: new Date().toISOString(),
-      };
+export async function sendOptInMessage(senderID: string, config: Config) {
+  // const updatedConfig = config.getUserByID(senderID)
+  //   ? {
+  //       ...config,
+  //       users: config.users.map((user) =>
+  //         user.id === senderID
+  //           ? {
+  //               ...user,
+  //               updated_at: new Date().toISOString(),
+  //             }
+  //           : user
+  //       ),
+  //       updated_at: new Date().toISOString(),
+  //     }
+  //   : {
+  //       ...config,
+  //       users: [
+  //         ...config.users,
+  //         {
+  //           id: senderID,
+  //           created_at: new Date().toISOString(),
+  //           updated_at: new Date().toISOString(),
+  //         },
+  //       ],
+  //       updated_at: new Date().toISOString(),
+  //     };
 
-  const { error } = await setConfig(updatedConfig);
-  if (error) {
-    await sendFacebookMessage(
+  if (!(await config.addUserToConfig(senderID))) {
+    await FacebookAPI.sendMessage(
       "An internal server error occurred. Please try again in a while.",
+      config,
       senderID,
       true
     );
-    console.error("Error setting user ID in config: ", error);
+    console.error("Error adding user to config: ");
     return;
   }
 
-  await sendFacebookMessageNotifMsgReq(senderID);
+  await FacebookAPI.sendNotifMessageReq(senderID);
   return;
 }
 

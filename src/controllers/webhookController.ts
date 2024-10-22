@@ -9,6 +9,8 @@ import {
 import { formatDate, getUserByID, getUserRecipientID } from "../lib/utils";
 import dotenv from "dotenv";
 import IConfig from "../types/config";
+import Config from "../models/Config";
+import FacebookAPI from "../models/FacebookAPI";
 
 dotenv.config();
 
@@ -30,116 +32,75 @@ export function verifyToken(req: Request, res: Response) {
 
 export async function webhookCallback(req: Request, res: Response) {
   const body = req.body;
+  const config = new Config();
+  await config.fetchGetConfig();
+  if (config.isEmpty()) {
+    console.error("No config found");
+    res.sendStatus(500);
+    return;
+  }
   console.log(body);
   try {
     if (body.object === "page") {
-      const config = await getConfig();
-      if (!config) {
-        console.error("No config found");
-        console.log("Creating new config");
-        const newConfig = {
-          users: [],
-          updated_at: new Date().toISOString(),
-        };
-        const { error } = await setConfig(newConfig);
-        if (error) {
-          console.error("Error creating new config", error);
-          res.sendStatus(500);
-          return;
-        }
-        console.log("Try again");
-        res.sendStatus(500);
-        return;
-      }
-
       const entry = body.entry[0];
       const webhook_event = entry.messaging[0];
 
+      // Check if optin is about notification messages
       if (
         webhook_event.optin &&
         webhook_event.optin.notification_messages_token
       ) {
         console.log("Received optin for notification_messages", webhook_event);
 
-        const updatedConfigUsers = config.users.map((user) => {
-          if (user.id === webhook_event.sender.id) {
-            return {
-              ...user,
-              notification_messages: {
-                token: webhook_event.optin.notification_messages_token,
-                expiry_timestamp: webhook_event.optin.token_expiry_timestamp,
-                payload: webhook_event.optin.payload,
-              },
-            };
-          }
-          return user;
-        });
-
-        const _data: IConfig = {
-          ...config,
-          users: updatedConfigUsers,
-          updated_at: new Date().toUTCString(),
-        };
-
         if (
-          webhook_event.optin.notification_messages_status !==
+          webhook_event.optin.notification_messages_status ===
           "STOP_NOTIFICATIONS"
         ) {
-          console.log("UPDATING CONFIG", _data);
-          const _configRes = await setConfig(_data);
-          console.log("UPDATED CONFIG", _configRes);
+          config.removeUserFromConfig(webhook_event.sender.id);
 
-          const updatedConfig = await getConfig();
-          if (!updatedConfig) {
-            console.error("No config found");
-            res.sendStatus(500);
-            return;
-          }
-
-          const userConfig = getUserByID(
-            updatedConfig.users,
-            webhook_event.sender.id
+          await FacebookAPI.sendMessage(
+            "You have stopped receiving notification messages. If you would like to receive notification messages again, please opt-in again.",
+            config,
+            webhook_event.sender.id,
+            true
           );
+        } else {
+          console.log("UPDATING CONFIG", config.getConfig());
+          config.addUserNotificationMessages;
+
+          await config.fetchGetConfig();
+          console.log("UPDATED CONFIG", config.getConfig());
+
+          const userConfig = config.getUserByID(webhook_event.sender.id);
 
           if (!userConfig) {
-            console.error("No user found");
+            console.warn("No user found");
             res.sendStatus(500);
             return;
           }
 
-          if (!userConfig.notification_messages) {
-            await sendFacebookMessage(
+          if (!config.validateUserNotificationMessages(userConfig)) {
+            await FacebookAPI.sendMessage(
               "You need to allow messages to receive further alerts.",
-              webhook_event.sender.id
+              config,
+              webhook_event.sender.id,
+              true
             );
-            await sendFacebookMessageNotifMsgReq(webhook_event.sender.id);
+            await FacebookAPI.sendNotifMessageReq(webhook_event.sender.id);
 
             res.sendStatus(200);
             return;
           }
 
-          await sendFacebookMessage(
+          await FacebookAPI.sendMessage(
             `Your notification messages token is: "${
               userConfig.notification_messages!.token
             }". Please don't share it with anyone!\n\nYou will now receive notification alerts from smoke detection.`,
-            userConfig.id
-          );
-        } else {
-          const filteredUsers = config?.users.filter(
-            (user) => user.id !== webhook_event.sender.id
-          );
-          await setConfig({
-            users: filteredUsers,
-            updated_at: new Date().toUTCString(),
-          });
-
-          await sendFacebookMessage(
-            "You have stopped receiving notification messages. If you would like to receive notification messages again, please opt-in again.",
-            webhook_event.sender.id,
+            config,
+            config.getUserRecipientID(userConfig),
             true
           );
         }
-
         res.sendStatus(200);
         return;
       } else if (webhook_event.message && webhook_event.sender.id) {
