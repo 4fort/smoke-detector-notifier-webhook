@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import { ONE_TIME_NOTIF_TOKEN } from "../api";
 import IConfig from "../types/config";
 
 dotenv.config();
@@ -8,6 +7,14 @@ const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 
+async function promptUserIsAlreadyOptedIn(senderID: string) {
+  await sendFacebookMessage(
+    "You are already receiving alerts of smoke detection.",
+    senderID
+  );
+  return;
+}
+
 export async function handleMessage(senderID: string, messageText: string) {
   const config = await getConfig();
   if (!config) {
@@ -15,21 +22,13 @@ export async function handleMessage(senderID: string, messageText: string) {
     return;
   }
 
-  async function userIsAlreadyOptedIn() {
-    await sendFacebookMessage(
-      "You are already receiving alerts of smoke detection.",
-      senderID
-    );
-    return;
-  }
-
   if (config.user_id === senderID) {
     // Make a sendQuickReply() function where user can pick between ""
-    userIsAlreadyOptedIn();
+    await promptUserIsAlreadyOptedIn(senderID);
     return;
   } else if (messageText === PAGE_VERIFICATION_TOKEN) {
     if (config.user_id === senderID) {
-      userIsAlreadyOptedIn();
+      await promptUserIsAlreadyOptedIn(senderID);
       return;
     }
 
