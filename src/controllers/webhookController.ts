@@ -105,7 +105,7 @@ export async function webhookCallback(req: Request, res: Response) {
 
           await sendFacebookMessage(
             `Your notification messages token is: "${updatedConfig?.notification_messages_token}". Please don't share it with anyone!\n\nYou will now receive notification alerts from smoke detection.`,
-            updatedConfig?.user_id
+            updatedConfig?.notification_messages_token
           );
         } else {
           await setConfig({

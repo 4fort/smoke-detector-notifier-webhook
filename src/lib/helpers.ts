@@ -34,8 +34,9 @@ export async function handleMessage(senderID: string, messageText: string) {
       true
     );
     await sendFacebookMessage(
-      "Your account has been unbound from receiving alerts of smoke detection.",
-      config.user_id
+      "Your account has been unbound from receiving alerts of smoke detection. If you would like to receive alerts again, please provide the verification token below.",
+      config.user_id,
+      true
     );
     await sendOptInMessage(senderID);
   }
