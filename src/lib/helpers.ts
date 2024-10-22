@@ -22,11 +22,7 @@ export async function handleMessage(senderID: string, messageText: string) {
     return;
   }
 
-  if (config.user_id === senderID) {
-    // Make a sendQuickReply() function where user can pick between ""
-    await promptUserIsAlreadyOptedIn(senderID);
-    return;
-  } else if (messageText === PAGE_VERIFICATION_TOKEN) {
+  if (messageText === PAGE_VERIFICATION_TOKEN) {
     if (config.user_id === senderID) {
       await promptUserIsAlreadyOptedIn(senderID);
       return;
@@ -39,11 +35,17 @@ export async function handleMessage(senderID: string, messageText: string) {
     await sendOptInMessage(senderID);
     return;
   }
+  if (config.user_id === senderID) {
+    // Make a sendQuickReply() function where user can pick between ""
+    await promptUserIsAlreadyOptedIn(senderID);
+    return;
+  }
 
   await sendFacebookMessage(
     "Please provide the correct verification token to receive alerts.",
     senderID
   );
+  return;
 }
 
 export async function sendOptInMessage(recipientId: string) {
@@ -78,7 +80,7 @@ export async function getConfig(): Promise<IConfig | undefined | null> {
       if (response.ok) {
         const data: IConfig = await response.json();
 
-        console.log("Config Data: ", data);
+        console.log("Fetched config: ", data);
 
         return data;
       } else {
