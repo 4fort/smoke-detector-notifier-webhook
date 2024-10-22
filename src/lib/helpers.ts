@@ -16,6 +16,18 @@ export async function handleMessage(senderID: string, messageText: string) {
   const config = await getConfig();
   if (!config) {
     console.error("No config found");
+    console.log("Creating new config");
+    const newConfig = {
+      users: [],
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await setConfig(newConfig);
+    if (error) {
+      console.error("Error creating new config", error);
+      return;
+    }
+    console.log("Retrying message handling with new config created");
+    handleMessage(senderID, messageText);
     return;
   }
   const userConfig = getUserByID(config.users, senderID);
