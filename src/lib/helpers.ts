@@ -16,7 +16,6 @@ async function promptUserIsAlreadyOptedIn(senderID: string) {
 }
 
 export async function handleMessage(senderID: string, messageText: string) {
-  const delay = 500;
   const config = await getConfig();
   if (!config) {
     console.error("No config found");
@@ -31,12 +30,10 @@ export async function handleMessage(senderID: string, messageText: string) {
 
     await sendFacebookMessage(
       "You entered the correct verification token.",
-      senderID
+      senderID,
+      true
     );
-    setTimeout(async () => {
-      return await sendOptInMessage(senderID);
-    }, delay);
-    return;
+    return await sendOptInMessage(senderID);
   }
   if (config.user_id === senderID) {
     // Make a sendQuickReply() function where user can pick between ""
@@ -51,18 +48,23 @@ export async function handleMessage(senderID: string, messageText: string) {
   return;
 }
 
-export async function sendOptInMessage(recipientId: string) {
+export async function sendOptInMessage(senderID: string) {
   const configData = {
-    user_id: recipientId,
+    user_id: senderID,
   };
 
   const { error } = await setConfig(configData);
   if (error) {
+    await sendFacebookMessage(
+      "An internal server error occurred. Please try again in a while.",
+      senderID,
+      true
+    );
     console.error("Error setting user ID in config: ", error);
     return;
   }
 
-  await sendFacebookMessageNotifMsgReq(recipientId);
+  await sendFacebookMessageNotifMsgReq(senderID);
   return;
 }
 
