@@ -112,9 +112,11 @@ export default class Config {
     return true;
   }
 
-  public async addUserToConfig(id: string) {
+  public async addUserToConfig(
+    id: string
+  ): Promise<"ALREADY_EXISTS" | "ADDED" | "FAILED"> {
     if (this.getUserByID(id)) {
-      return false;
+      return "ALREADY_EXISTS";
     }
 
     const userConfig: IUser = {
@@ -131,8 +133,12 @@ export default class Config {
     };
 
     // Update the config
-    await this.fetchSetConfig(data);
-    return true;
+    const { error } = await this.fetchSetConfig(data);
+    if (error) {
+      return "FAILED";
+    }
+
+    return "ADDED";
   }
 
   public async addUserNotificationMessages(event: {

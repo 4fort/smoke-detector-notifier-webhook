@@ -58,33 +58,8 @@ export async function handleMessage(
 }
 
 export async function sendOptInMessage(senderID: string, config: Config) {
-  // const updatedConfig = config.getUserByID(senderID)
-  //   ? {
-  //       ...config,
-  //       users: config.users.map((user) =>
-  //         user.id === senderID
-  //           ? {
-  //               ...user,
-  //               updated_at: new Date().toISOString(),
-  //             }
-  //           : user
-  //       ),
-  //       updated_at: new Date().toISOString(),
-  //     }
-  //   : {
-  //       ...config,
-  //       users: [
-  //         ...config.users,
-  //         {
-  //           id: senderID,
-  //           created_at: new Date().toISOString(),
-  //           updated_at: new Date().toISOString(),
-  //         },
-  //       ],
-  //       updated_at: new Date().toISOString(),
-  //     };
-
-  if (!(await config.addUserToConfig(senderID))) {
+  const newUser = await config.addUserToConfig(senderID);
+  if (newUser === "FAILED") {
     await FacebookAPI.sendMessage(
       "An internal server error occurred. Please try again in a while.",
       config,
@@ -93,6 +68,14 @@ export async function sendOptInMessage(senderID: string, config: Config) {
     );
     console.error("Error adding user to config: ");
     return;
+  } else if (newUser === "ALREADY_EXISTS") {
+    await FacebookAPI.sendMessage(
+      "You have already opted in.\n\nYou need to allow messages to receive further alerts.",
+      config,
+      senderID,
+      true
+    );
+    console.warn("User already exists in config");
   }
 
   await FacebookAPI.sendNotifMessageReq(senderID);
