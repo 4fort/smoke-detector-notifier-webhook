@@ -10,7 +10,7 @@ export default class FacebookAPI {
     text: string,
     config: Config,
     recipientID: string,
-    forceUseParamRecipientID = false
+    forceUserID = false
   ): Promise<{
     error: Record<string, string> | string | null;
     response: Record<string, string> | null;
@@ -22,9 +22,13 @@ export default class FacebookAPI {
     }
 
     const recipient =
-      forceUseParamRecipientID || !userConfig
-        ? { id: recipientID }
-        : { id: config.getUserRecipientID(userConfig) };
+      forceUserID && userConfig
+        ? { id: userConfig.id }
+        : userConfig
+        ? { id: config.getUserRecipientID(userConfig) }
+        : {
+            id: recipientID,
+          };
 
     const messageData = {
       recipient,
