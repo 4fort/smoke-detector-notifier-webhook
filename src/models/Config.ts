@@ -10,7 +10,7 @@ export default class Config {
 
   public async fetchGetConfig() {
     try {
-      if (this.URI) {
+      if (!this.URI) {
         throw new Error("Missing CONFIG_URL or CONFIG_KEY");
       }
       const response = await fetch(this.URI, {

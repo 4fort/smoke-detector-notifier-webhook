@@ -205,3 +205,10 @@ export async function sendMessage(req: Request, res: Response) {
     error: error ? error : null,
   });
 }
+
+export async function getConfigController(req: Request, res: Response) {
+  const config = new Config();
+  config.fetchGetConfig();
+  res.send(config.getConfig()).status(200);
+  return;
+}

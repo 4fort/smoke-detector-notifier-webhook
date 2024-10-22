@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import logger from "../middleware";
 import { formatDate } from "../lib/utils";
 import {
+  getConfigController,
   notifMsgRequest,
   sendMessage,
   smokeDetected,
@@ -41,6 +42,8 @@ app.post("/api/webhook/smoke-detected", smokeDetected);
 app.post("/api/webhook/notif-msg-req", notifMsgRequest);
 
 app.post("/api/webhook/send-message", sendMessage);
+
+app.get("/api/config", getConfigController);
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
