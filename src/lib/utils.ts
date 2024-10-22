@@ -1,3 +1,6 @@
+import IUser from "../types/user";
+import { sendFacebookMessage } from "./helpers";
+
 export function setTextStyle(
   text: string | number,
   color:
@@ -66,4 +69,23 @@ export function convertTimestamp(fbTimestamp: string) {
   const readableDate = date.toISOString().replace("T", " ").split(".")[0];
 
   return readableDate;
+}
+
+export async function promptUserIsAlreadyOptedIn(senderID: string) {
+  await sendFacebookMessage(
+    "You are already receiving alerts of smoke detection.",
+    senderID
+  );
+  return;
+}
+
+export function getUserByID(config_users: IUser[], senderID: string) {
+  const user = config_users.find((user) => user.id === senderID);
+  return user;
+}
+
+export function getUserRecipientID(user: IUser) {
+  return user.notification_messages
+    ? user.notification_messages.token
+    : user.id;
 }

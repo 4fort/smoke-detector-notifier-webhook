@@ -1,5 +1,10 @@
 import dotenv from "dotenv";
 import IConfig from "../types/config";
+import {
+  promptUserIsAlreadyOptedIn,
+  getUserByID,
+  getUserRecipientID,
+} from "./utils";
 
 dotenv.config();
 
@@ -7,23 +12,23 @@ const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 
-async function promptUserIsAlreadyOptedIn(senderID: string) {
-  await sendFacebookMessage(
-    "You are already receiving alerts of smoke detection.",
-    senderID
-  );
-  return;
-}
-
 export async function handleMessage(senderID: string, messageText: string) {
   const config = await getConfig();
   if (!config) {
     console.error("No config found");
     return;
   }
+  const userConfig = getUserByID(config.users, senderID);
+  if (!userConfig) {
+    console.error("User not found in config");
+    return;
+  }
 
   if (messageText === PAGE_VERIFICATION_TOKEN) {
-    if (config.user_id === senderID) {
+    if (
+      userConfig.notification_messages &&
+      userConfig.notification_messages.token
+    ) {
       await promptUserIsAlreadyOptedIn(senderID);
       return;
     }
@@ -33,15 +38,15 @@ export async function handleMessage(senderID: string, messageText: string) {
       senderID,
       true
     );
-    await sendFacebookMessage(
-      "Your account has been unbound from receiving alerts of smoke detection. If you would like to receive alerts again, please provide the verification token below.",
-      config.user_id,
-      true
-    );
-    await sendOptInMessage(senderID);
+    await sendOptInMessage(senderID, config);
+    return;
   }
-  if (config.user_id === senderID) {
-    // Make a sendQuickReply() function where user can pick between ""
+
+  // Make a sendQuickReply() function where user can pick between "Refresh" and "Unbind"
+  if (
+    userConfig.notification_messages &&
+    userConfig.notification_messages.token
+  ) {
     await promptUserIsAlreadyOptedIn(senderID);
     return;
   }
@@ -53,12 +58,21 @@ export async function handleMessage(senderID: string, messageText: string) {
   return;
 }
 
-export async function sendOptInMessage(senderID: string) {
-  const configData = {
-    user_id: senderID,
+export async function sendOptInMessage(senderID: string, config: IConfig) {
+  const updatedConfig = {
+    ...config,
+    users: [
+      ...config.users,
+      {
+        id: senderID,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ],
+    updated_at: new Date().toISOString(),
   };
 
-  const { error } = await setConfig(configData);
+  const { error } = await setConfig(updatedConfig);
   if (error) {
     await sendFacebookMessage(
       "An internal server error occurred. Please try again in a while.",
@@ -104,7 +118,7 @@ export async function getConfig(): Promise<IConfig | undefined | null> {
   }
 }
 
-export async function setConfig(_data: Record<string, string | number>) {
+export async function setConfig(_data: IConfig) {
   const CONFIG_URL = process.env.CONFIGURATION_URL;
   const CONFIG_KEY = process.env.CONFIGURATION_KEY;
   const URI = `${CONFIG_URL}${CONFIG_KEY}`;
@@ -119,7 +133,7 @@ export async function setConfig(_data: Record<string, string | number>) {
     console.log("Setting config: ", _data);
 
     const response = await fetch(URI, {
-      method: "PATCH",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -142,8 +156,8 @@ export async function setConfig(_data: Record<string, string | number>) {
 
 export async function sendFacebookMessage(
   text: string,
-  recipientID?: string,
-  force_userID = false
+  recipientID: string,
+  forceUseParamRecipientID = false
 ) {
   const config = await getConfig();
 
@@ -152,20 +166,16 @@ export async function sendFacebookMessage(
     return { error: "No config found" };
   }
 
-  const {
-    user_id,
-    notification_messages_token,
-    notification_token_expiry_timestamp,
-  } = config;
+  const userConfig = getUserByID(config.users, recipientID);
 
-  const recipient = force_userID
+  if (!userConfig) {
+    console.error("No user found");
+    return { error: "No user found" };
+  }
+
+  const recipient = forceUseParamRecipientID
     ? { id: recipientID }
-    : validateToken(notification_token_expiry_timestamp) &&
-      notification_messages_token !== ""
-    ? { notification_messages_token }
-    : recipientID
-    ? { id: recipientID }
-    : { id: user_id };
+    : { id: getUserRecipientID(userConfig) };
 
   const messageData = {
     recipient,
@@ -193,7 +203,7 @@ export async function sendFacebookMessage(
       console.error("Unable to send message:", errorBody.error);
 
       console.log("Retrying with user_id");
-      const _user_id = recipientID ? recipientID : user_id;
+      const _user_id = recipientID ? recipientID : userConfig.id;
       return await sendFacebookMessage(text, _user_id, true);
     }
 
@@ -202,52 +212,6 @@ export async function sendFacebookMessage(
   } catch (error) {
     console.error("Fetch error:", error);
     return { error: error };
-  }
-}
-
-export async function sendFacebookMessageTag(
-  recipientId: string,
-  text: string
-) {
-  const messageData = {
-    recipient: { id: recipientId },
-    message: {
-      attachment: {
-        type: "template",
-        payload: {
-          template_type: "one_time_notif_req",
-          title: text,
-          payload: "OTN_PAYLOAD",
-        },
-      },
-    },
-    access_token: PAGE_ACCESS_TOKEN,
-  };
-
-  try {
-    console.log("Sending message: ", messageData);
-    const response = await fetch(
-      `https://graph.facebook.com/v21.0/${PAGE_ID}/messages`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(messageData),
-      }
-    );
-
-    if (response.ok) {
-      console.log("Message sent");
-      return { error: null, response: await response.json() };
-    } else {
-      const errorBody = await response.json();
-      console.error("Unable to send message:", errorBody.error);
-      return { error: errorBody.error, response: null };
-    }
-  } catch (error) {
-    console.error("Fetch error:", error);
-    return { error: error, response: null };
   }
 }
 

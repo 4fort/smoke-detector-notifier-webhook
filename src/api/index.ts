@@ -5,7 +5,6 @@ import logger from "../middleware";
 import { formatDate } from "../lib/utils";
 import {
   notifMsgRequest,
-  otnRequest,
   sendMessage,
   smokeDetected,
   verifyToken,
@@ -17,21 +16,6 @@ dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT;
-
-export let USER_ID: string;
-export let ONE_TIME_NOTIF_TOKEN: string;
-
-async function setup() {
-  console.log("Setting up...");
-  const data = await getConfig();
-  USER_ID = data!.user_id;
-  ONE_TIME_NOTIF_TOKEN = data!.one_time_notif_token;
-
-  console.log("USER_ID: ", USER_ID);
-  console.log("ONE_TIME_NOTIF_TOKEN: ", ONE_TIME_NOTIF_TOKEN);
-
-  console.log("Setup complete.");
-}
 
 app.use(cors());
 app.use(express.json());
@@ -52,15 +36,13 @@ app.post("/api/webhook", webhookCallback);
 // Receive messages or events (from ESP32 or Facebook)
 app.post("/api/webhook/smoke-detected", smokeDetected);
 
-app.post("/api/webhook/otn-req", otnRequest);
+// app.post("/api/webhook/otn-req", otnRequest);
 
 app.post("/api/webhook/notif-msg-req", notifMsgRequest);
 
 app.post("/api/webhook/send-message", sendMessage);
 
 app.listen(PORT, () => {
-  setup();
-
   console.log(`Server is running at http://localhost:${PORT}`);
 });
 
