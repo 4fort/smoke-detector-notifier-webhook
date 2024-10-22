@@ -15,18 +15,7 @@ export async function handleMessage(senderID: string, messageText: string) {
     return;
   }
 
-  if (config.user_id === senderID) {
-    if (messageText === PAGE_VERIFICATION_TOKEN) {
-      await sendFacebookMessage(
-        "You entered the correct verification token.",
-        senderID
-      );
-      await sendOptInMessage(senderID);
-
-      return;
-    }
-
-    // Make a sendQuickReply() function where user can pick between ""
+  async function userIsAlreadyOptedIn() {
     await sendFacebookMessage(
       "You are already receiving alerts of smoke detection.",
       senderID
@@ -34,8 +23,26 @@ export async function handleMessage(senderID: string, messageText: string) {
     return;
   }
 
+  if (config.user_id === senderID) {
+    // Make a sendQuickReply() function where user can pick between ""
+    userIsAlreadyOptedIn();
+    return;
+  } else if (messageText === PAGE_VERIFICATION_TOKEN) {
+    if (config.user_id === senderID) {
+      userIsAlreadyOptedIn();
+      return;
+    }
+
+    await sendFacebookMessage(
+      "You entered the correct verification token.",
+      senderID
+    );
+    await sendOptInMessage(senderID);
+    return;
+  }
+
   await sendFacebookMessage(
-    "Please provide the correct verification token.",
+    "Please provide the correct verification token to receive alerts.",
     senderID
   );
 }
