@@ -181,7 +181,7 @@ export async function sendFacebookMessage(
   const userConfig = getUserByID(config.users, recipientID);
 
   if (!userConfig) {
-    console.error("No user found");
+    console.error("No user found: ", recipientID);
   }
 
   const recipient =
