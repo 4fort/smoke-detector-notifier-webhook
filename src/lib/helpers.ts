@@ -182,12 +182,12 @@ export async function sendFacebookMessage(
 
   if (!userConfig) {
     console.error("No user found");
-    return { error: "No user found" };
+    forceUseParamRecipientID = true;
   }
 
   const recipient = forceUseParamRecipientID
     ? { id: recipientID }
-    : { id: getUserRecipientID(userConfig) };
+    : { id: getUserRecipientID(userConfig!) };
 
   const messageData = {
     recipient,
@@ -215,7 +215,7 @@ export async function sendFacebookMessage(
       console.error("Unable to send message:", errorBody.error);
 
       console.log("Retrying with user_id");
-      const _user_id = recipientID ? recipientID : userConfig.id;
+      const _user_id = recipientID ? recipientID : userConfig!.id;
       return await sendFacebookMessage(text, _user_id, true);
     }
 
