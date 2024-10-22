@@ -171,7 +171,8 @@ export default class Config {
     };
 
     // Update the config
-    return await this.fetchSetConfig(data);
+    await this.fetchSetConfig(data);
+    return;
   }
 
   public async removeUserFromConfig(id: string) {

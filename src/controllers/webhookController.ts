@@ -59,14 +59,14 @@ export async function webhookCallback(req: Request, res: Response) {
           config.removeUserFromConfig(webhook_event.sender.id);
 
           await FacebookAPI.sendMessage(
-            "You have stopped receiving notification messages. If you would like to receive notification messages again, please opt-in again.",
+            "You have stopped receiving notification messages. If you would like to receive notification messages again, just provide the token again.",
             config,
             webhook_event.sender.id,
             true
           );
         } else {
           console.log("UPDATING CONFIG", config.getConfig());
-          config.addUserNotificationMessages;
+          config.addUserNotificationMessages(webhook_event);
 
           await config.fetchGetConfig();
           console.log("UPDATED CONFIG", config.getConfig());
