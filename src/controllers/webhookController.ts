@@ -67,8 +67,7 @@ export async function webhookCallback(req: Request, res: Response) {
               notification_messages: {
                 token: webhook_event.optin.notification_messages_token,
                 expiry_timestamp: webhook_event.optin.token_expiry_timestamp,
-                payload:
-                  webhook_event.notification_messages_tokent.optin.payload,
+                payload: webhook_event.optin.payload,
               },
             };
           }

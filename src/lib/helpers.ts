@@ -23,6 +23,7 @@ export async function handleMessage(
   }
 
   if (messageText === PAGE_VERIFICATION_TOKEN) {
+    console.log("User entered verification token: ", messageText);
     if (
       userConfig &&
       userConfig.notification_messages &&
