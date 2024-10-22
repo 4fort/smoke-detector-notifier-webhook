@@ -60,18 +60,31 @@ export async function handleMessage(
 }
 
 export async function sendOptInMessage(senderID: string, config: IConfig) {
-  const updatedConfig = {
-    ...config,
-    users: [
-      ...config.users,
-      {
-        id: senderID,
-        created_at: new Date().toISOString(),
+  const updatedConfig = getUserByID(config.users, senderID)
+    ? {
+        ...config,
+        users: config.users.map((user) =>
+          user.id === senderID
+            ? {
+                ...user,
+                updated_at: new Date().toISOString(),
+              }
+            : user
+        ),
         updated_at: new Date().toISOString(),
-      },
-    ],
-    updated_at: new Date().toISOString(),
-  };
+      }
+    : {
+        ...config,
+        users: [
+          ...config.users,
+          {
+            id: senderID,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+        updated_at: new Date().toISOString(),
+      };
 
   const { error } = await setConfig(updatedConfig);
   if (error) {
