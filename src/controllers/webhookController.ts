@@ -37,6 +37,17 @@ export async function webhookCallback(req: Request, res: Response) {
       const config = await getConfig();
       if (!config) {
         console.error("No config found");
+        console.log("Creating new config");
+        const newConfig = {
+          users: [],
+          updated_at: new Date().toISOString(),
+        };
+        const { error } = await setConfig(newConfig);
+        if (error) {
+          console.error("Error creating new config", error);
+          return;
+        }
+        console.log("Try again");
         return;
       }
 
@@ -133,7 +144,8 @@ export async function webhookCallback(req: Request, res: Response) {
         if (webhook_event.message.text) {
           await handleMessage(
             webhook_event.sender.id,
-            webhook_event.message.text
+            webhook_event.message.text,
+            config
           );
         }
 

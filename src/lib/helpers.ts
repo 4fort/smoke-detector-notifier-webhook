@@ -12,23 +12,11 @@ const PAGE_ID = process.env.PAGE_ID;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const PAGE_VERIFICATION_TOKEN = process.env.PAGE_VERIFICATION_TOKEN;
 
-export async function handleMessage(senderID: string, messageText: string) {
-  const config = await getConfig();
-  if (!config) {
-    console.error("No config found");
-    console.log("Creating new config");
-    const newConfig = {
-      users: [],
-      updated_at: new Date().toISOString(),
-    };
-    const { error } = await setConfig(newConfig);
-    if (error) {
-      console.error("Error creating new config", error);
-      return;
-    }
-    console.log("Try again");
-    return;
-  }
+export async function handleMessage(
+  senderID: string,
+  messageText: string,
+  config: IConfig
+) {
   const userConfig = getUserByID(config.users, senderID);
   if (!userConfig) {
     console.error("User not found in config");
