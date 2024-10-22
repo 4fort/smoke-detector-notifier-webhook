@@ -97,7 +97,7 @@ export async function webhookCallback(req: Request, res: Response) {
               userConfig.notification_messages!.token
             }". Please don't share it with anyone!\n\nYou will now receive notification alerts from smoke detection.`,
             config,
-            config.getUserRecipientID(userConfig),
+            userConfig.id,
             true
           );
         }

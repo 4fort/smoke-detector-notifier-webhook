@@ -25,7 +25,7 @@ export default class FacebookAPI {
       forceUserID && userConfig
         ? { id: userConfig.id }
         : userConfig
-        ? { id: config.getUserRecipientID(userConfig) }
+        ? config.getUserRecipientID(userConfig)
         : {
             id: recipientID,
           };
@@ -58,7 +58,12 @@ export default class FacebookAPI {
 
         console.log("Retrying with user_id");
         const _user_id = recipientID ? recipientID : userConfig!.id;
-        await this.sendMessage(text, config, _user_id, true);
+        await this.sendMessage(
+          text,
+          config,
+          config.getUserByID(_user_id)?.id!,
+          true
+        );
         return { error: body.error, response: null };
       }
 

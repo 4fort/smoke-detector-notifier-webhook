@@ -101,8 +101,8 @@ export default class Config {
 
   public getUserRecipientID(user: IUser) {
     return this.validateUserNotificationMessages(user)
-      ? user.notification_messages!.token
-      : user.id;
+      ? { notification_messages_token: user.notification_messages!.token }
+      : { id: user.id };
   }
 
   public validateUserNotificationMessages(user: IUser) {
