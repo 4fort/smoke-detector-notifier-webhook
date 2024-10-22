@@ -26,18 +26,17 @@ export async function handleMessage(senderID: string, messageText: string) {
       console.error("Error creating new config", error);
       return;
     }
-    console.log("Retrying message handling with new config created");
-    handleMessage(senderID, messageText);
+    console.log("Try again");
     return;
   }
   const userConfig = getUserByID(config.users, senderID);
   if (!userConfig) {
     console.error("User not found in config");
-    return;
   }
 
   if (messageText === PAGE_VERIFICATION_TOKEN) {
     if (
+      userConfig &&
       userConfig.notification_messages &&
       userConfig.notification_messages.token
     ) {
@@ -56,6 +55,7 @@ export async function handleMessage(senderID: string, messageText: string) {
 
   // Make a sendQuickReply() function where user can pick between "Refresh" and "Unbind"
   if (
+    userConfig &&
     userConfig.notification_messages &&
     userConfig.notification_messages.token
   ) {
