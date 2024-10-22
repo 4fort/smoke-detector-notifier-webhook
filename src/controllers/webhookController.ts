@@ -5,7 +5,6 @@ import {
   sendFacebookMessage,
   sendFacebookMessageNotifMsgReq,
   setConfig,
-  validateToken,
 } from "../lib/helpers";
 import { formatDate, getUserByID, getUserRecipientID } from "../lib/utils";
 import dotenv from "dotenv";
@@ -124,7 +123,6 @@ export async function webhookCallback(req: Request, res: Response) {
             (user) => user.id !== webhook_event.sender.id
           );
           await setConfig({
-            current_user_id: "",
             users: filteredUsers,
             updated_at: new Date().toUTCString(),
           });
@@ -173,6 +171,8 @@ export async function smokeDetected(req: Request, res: Response) {
 
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && config) {
+    const errors = [];
+
     for (const user of config.users) {
       const { error } = await sendFacebookMessage(
         text,
@@ -180,23 +180,31 @@ export async function smokeDetected(req: Request, res: Response) {
       );
 
       if (error) {
-        console.error(error);
-        res.status(500).send({
-          status: "EVENT_RECEIVED",
-          error: { message: "Unknown event", body },
-        });
-        return;
+        console.error(`Error sending message to user ${user.id}: `, error);
+        errors.push({ user: user.id, error });
+      } else {
+        console.log("Sent message to user: ", user.id);
       }
+    }
 
-      console.log("Sent message to user: ", user.id);
-      res.status(200).send({
+    if (errors.length) {
+      // Respond with an error if any message failed
+      res.status(500).send({
         status: "EVENT_RECEIVED",
-        error: error ? error : null,
+        errors,
       });
       return;
     }
+
+    // All messages sent successfully
+    res.status(200).send({
+      status: "EVENT_RECEIVED",
+      error: null,
+    });
+    return;
   }
 
+  // Handle unknown event
   res.status(200).send({
     status: "EVENT_RECEIVED",
     error: { message: "Unknown event", body },

@@ -89,3 +89,9 @@ export function getUserRecipientID(user: IUser) {
     ? user.notification_messages.token
     : user.id;
 }
+
+export function validateToken(timestamp: string) {
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const expiryTimestamp = parseInt(timestamp, 10);
+  return currentTimestamp < expiryTimestamp;
+}
