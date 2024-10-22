@@ -76,7 +76,7 @@ export async function webhookCallback(req: Request, res: Response) {
 
         const _data: IConfig = {
           ...config,
-          users: [...updatedConfigUsers],
+          users: updatedConfigUsers,
           updated_at: new Date().toUTCString(),
         };
 
