@@ -213,7 +213,7 @@ export async function sendMessage(req: Request, res: Response) {
 
   const id = body.recipient_id;
 
-  const { error } = await sendFacebookMessage(body.text, id);
+  const { error } = await sendFacebookMessage(body.text, id, true);
   res.status(200).send({
     status: "EVENT_RECEIVED",
     error: error ? error : null,
