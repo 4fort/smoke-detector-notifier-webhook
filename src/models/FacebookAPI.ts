@@ -143,7 +143,6 @@ export default class FacebookAPI {
             id: recipientID,
           };
 
-    console.log(quickReplies);
     const _quickReplies: {
       content_type: string;
       title: string;
@@ -156,11 +155,9 @@ export default class FacebookAPI {
       return {
         content_type: "text",
         title: qr,
-        payload: `QUICK_REPLY_PAYLOAD_${qr.toUpperCase().replace(/\s+/g, "")}`,
+        payload: qr.toUpperCase().replace(/\s+/g, ""),
       };
     });
-
-    console.log(_quickReplies);
 
     const messageData = {
       recipient,

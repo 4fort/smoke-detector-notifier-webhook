@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   getConfig,
   handleMessage,
+  handleQuickReply,
   sendFacebookMessage,
   sendFacebookMessageNotifMsgReq,
   setConfig,
@@ -102,6 +103,13 @@ export async function webhookCallback(req: Request, res: Response) {
           );
         }
         res.sendStatus(200);
+        return;
+      } else if (webhook_event.message.quick_reply) {
+        const payload = webhook_event.message.quick_reply.payload;
+        const senderID = webhook_event.sender.id;
+
+        console.log("Received quick reply", webhook_event);
+        await handleQuickReply(senderID, payload, config);
         return;
       } else if (webhook_event.message && webhook_event.sender.id) {
         console.log("Received message", webhook_event);

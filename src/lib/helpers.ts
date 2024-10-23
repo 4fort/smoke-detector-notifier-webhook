@@ -47,7 +47,7 @@ export async function handleMessage(
     if (newUser !== "FAILED") {
       await FacebookAPI.sendQuickReply(
         "You entered the correct verification token.",
-        ["Request further notifications", "Cancel"],
+        ["Continue", "Cancel"],
         config,
         senderID,
         true
@@ -78,6 +78,31 @@ export async function handleMessage(
     senderID,
     true
   );
+  return;
+}
+
+export async function handleQuickReply(
+  senderID: string,
+  payload: "CONTINUE" | "CANCEL" | "REFRESH" | "STOP",
+  config: Config
+) {
+  switch (payload) {
+    case "CONTINUE":
+      await FacebookAPI.sendNotifMessageReq(senderID);
+      break;
+    case "CANCEL":
+      await config.removeUserFromConfig(senderID);
+      break;
+    case "REFRESH":
+      await FacebookAPI.sendNotifMessageReq(senderID);
+      break;
+    case "STOP":
+      await config.removeUserFromConfig(senderID);
+      break;
+    default:
+      break;
+  }
+
   return;
 }
 
