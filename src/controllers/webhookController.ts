@@ -110,6 +110,7 @@ export async function webhookCallback(req: Request, res: Response) {
 
         console.log("Received quick reply", webhook_event);
         await handleQuickReply(senderID, payload, config);
+        res.sendStatus(200);
         return;
       } else if (webhook_event.message && webhook_event.sender.id) {
         console.log("Received message", webhook_event);
