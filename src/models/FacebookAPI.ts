@@ -34,11 +34,7 @@ export default class FacebookAPI {
     const recipient =
       forceUserID && userConfig
         ? { id: userConfig.id }
-        : forceUserID
-        ? { id: recipientID }
-        : userConfig
-        ? config.getUserRecipientID(userConfig)
-        : { id: recipientID };
+        : userConfig && config.getUserRecipientID(userConfig);
 
     const messageData = {
       recipient,
