@@ -151,7 +151,7 @@ export default class FacebookAPI {
       return {
         content_type: "text",
         title: qr,
-        payload: `QUICK_REPLY_PAYLOAD_${qr.split("").join("")}`,
+        payload: `QUICK_REPLY_PAYLOAD_${qr.toUpperCase().replace(/\s+/g, "")}`,
       };
     });
 

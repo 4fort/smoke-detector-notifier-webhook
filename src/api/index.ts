@@ -7,6 +7,7 @@ import {
   getConfigController,
   notifMsgRequest,
   sendMessage,
+  sendQuickReply,
   smokeDetected,
   verifyToken,
   webhookCallback,
@@ -39,9 +40,11 @@ app.post("/api/webhook/smoke-detected", smokeDetected);
 
 // app.post("/api/webhook/otn-req", otnRequest);
 
-app.post("/api/webhook/notif-msg-req", notifMsgRequest);
+app.post("/api/webhook/test/notif-msg-req", notifMsgRequest);
 
-app.post("/api/webhook/send-message", sendMessage);
+app.post("/api/webhook/test/send-message", sendMessage);
+
+app.post("/api/webhook/test/send-quick-reply", sendQuickReply);
 
 app.get("/api/config", getConfigController);
 

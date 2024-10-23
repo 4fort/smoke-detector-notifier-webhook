@@ -206,6 +206,26 @@ export async function sendMessage(req: Request, res: Response) {
   });
 }
 
+export async function sendQuickReply(req: Request, res: Response) {
+  const body = req.body;
+  const config = new Config();
+  config.fetchGetConfig();
+
+  const response = await FacebookAPI.sendQuickReply(
+    body.message.text,
+    body.message.quick_replies,
+    config,
+    body.recipient.id,
+    true
+  );
+
+  res.status(200).send({
+    status: "EVENT_RECEIVED",
+    response,
+    error: null,
+  });
+}
+
 export async function getConfigController(req: Request, res: Response) {
   const config = new Config();
   config.fetchGetConfig();
