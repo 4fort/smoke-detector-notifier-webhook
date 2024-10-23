@@ -86,23 +86,20 @@ export async function handleQuickReply(
   payload: "CONTINUE" | "CANCEL" | "REFRESH" | "STOP",
   config: Config
 ) {
-  // switch (payload) {
-  //   case "CONTINUE":
-  //     return;
-  //     await FacebookAPI.sendNotifMessageReq(senderID);
-  //     return;
-  //   case "CANCEL":
-  //     await config.removeUserFromConfig(senderID);
-  //     return;
-  //   case "REFRESH":
-  //     await FacebookAPI.sendNotifMessageReq(senderID);
-  //     return;
-  //   case "STOP":
-  //     await config.removeUserFromConfig(senderID);
-  //     return;
-  // }
-
-  return;
+  switch (payload) {
+    case "CONTINUE":
+      await FacebookAPI.sendNotifMessageReq(senderID);
+      return;
+    case "CANCEL":
+      await config.removeUserFromConfig(senderID);
+      return;
+    case "REFRESH":
+      await FacebookAPI.sendNotifMessageReq(senderID);
+      return;
+    case "STOP":
+      await config.removeUserFromConfig(senderID);
+      return;
+  }
 }
 
 // TODO: change logic. Do not add user to config right away when entering verification token
