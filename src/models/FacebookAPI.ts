@@ -22,14 +22,23 @@ export default class FacebookAPI {
       console.warn("No user found: ", recipientID);
     }
 
+    // const recipient =
+    //   forceUserID && userConfig
+    //     ? { id: userConfig.id }
+    //     : userConfig
+    //     ? config.getUserRecipientID(userConfig)
+    //     : {
+    //         id: recipientID,
+    //       };
+
     const recipient =
       forceUserID && userConfig
         ? { id: userConfig.id }
+        : forceUserID
+        ? { id: recipientID }
         : userConfig
         ? config.getUserRecipientID(userConfig)
-        : {
-            id: recipientID,
-          };
+        : { id: recipientID };
 
     const messageData = {
       recipient,
