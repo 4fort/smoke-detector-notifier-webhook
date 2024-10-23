@@ -83,7 +83,7 @@ export default class FacebookAPI {
             template_type: "notification_messages",
             notification_messages_timezone: "UTC",
             title: "Allow notifications to receive smoke detection alerts.",
-            payload: "ADDITIONAL-WEBHOOK-INFORMATION",
+            payload: "USER_ALLOW_NOTIFICATION_MESSAGES",
             notification_messages_cta_text: "ALLOW",
           },
         },
