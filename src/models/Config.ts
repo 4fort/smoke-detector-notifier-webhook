@@ -89,10 +89,7 @@ export default class Config {
   }
 
   public getUsers() {
-    return {
-      users: this.users,
-      updated_at: this.updated_at,
-    };
+    return this.users.map((user) => user);
   }
 
   public getUserByID(id: string) {

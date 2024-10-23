@@ -61,8 +61,6 @@ export async function handleMessage(
       senderID,
       true
     );
-
-    // await sendOptInMessage(senderID, config);
     return;
   }
 

@@ -141,19 +141,19 @@ export async function webhookCallback(req: Request, res: Response) {
 }
 
 export async function smokeDetected(req: Request, res: Response) {
+  const config = new Config();
+  await config.fetchGetConfig();
+
   const text = "Smoke detected! at " + formatDate(new Date());
   const body = req.body;
-  const config = await getConfig();
+  // const config = await getConfig();
 
   // Handle ESP32 smoke detection payload
   if (body.event === "smoke_detected" && config) {
     const errors = [];
 
-    for (const user of config.users) {
-      const { error } = await sendFacebookMessage(
-        text,
-        getUserRecipientID(user)
-      );
+    for (const user of config.getUsers()) {
+      const { error } = await FacebookAPI.sendMessage(text, config, user.id);
 
       if (error) {
         console.error(`Error sending message to user ${user.id}: `, error);
