@@ -7,6 +7,7 @@ import {
 } from "./utils";
 import Config from "../models/Config";
 import FacebookAPI from "../models/FacebookAPI";
+import { Response } from "express";
 
 dotenv.config();
 
@@ -82,22 +83,36 @@ export async function handleMessage(
 export async function handleQuickReply(
   senderID: string,
   payload: "CONTINUE" | "CANCEL" | "REFRESH" | "STOP",
-  config: Config
+  config: Config,
+  res: Response
 ) {
   switch (payload) {
     case "CONTINUE":
       await FacebookAPI.sendNotifMessageReq(senderID);
-      return;
+      break;
     case "CANCEL":
       await config.removeUserFromConfig(senderID);
-      return;
+      await FacebookAPI.sendMessage(
+        "You have stopped receiving notification messages. If you would like to receive notification messages again, just provide the token again.",
+        config,
+        senderID,
+        true
+      );
+      break;
     case "REFRESH":
       await FacebookAPI.sendNotifMessageReq(senderID);
-      return;
+      break;
     case "STOP":
       await config.removeUserFromConfig(senderID);
-      return;
+      await FacebookAPI.sendMessage(
+        "You have stopped receiving notification messages. If you would like to receive notification messages again, just provide the token again.",
+        config,
+        senderID,
+        true
+      );
+      break;
   }
+  res.sendStatus(200);
 }
 
 // TODO: change logic. Do not add user to config right away when entering verification token
