@@ -213,7 +213,7 @@ export async function sendQuickReply(req: Request, res: Response) {
 
   const response = await FacebookAPI.sendQuickReply(
     body.message.text,
-    body.message.quick_replies,
+    body.message.quick_replies.map((q: any) => q.title),
     config,
     body.recipient.id,
     true

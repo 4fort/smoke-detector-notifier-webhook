@@ -143,17 +143,24 @@ export default class FacebookAPI {
             id: recipientID,
           };
 
+    console.log(quickReplies);
     const _quickReplies: {
-      content_type: "text";
+      content_type: string;
       title: string;
       payload: string;
     }[] = quickReplies.map((qr) => {
+      if (typeof qr !== "string") {
+        throw new Error(`Quick reply must be a string: ${qr}`);
+      }
+
       return {
         content_type: "text",
         title: qr,
         payload: `QUICK_REPLY_PAYLOAD_${qr.toUpperCase().replace(/\s+/g, "")}`,
       };
     });
+
+    console.log(_quickReplies);
 
     const messageData = {
       recipient,
@@ -162,6 +169,7 @@ export default class FacebookAPI {
         text,
         quick_replies: _quickReplies,
       },
+      access_token: this.PAGE_ACCESS_TOKEN,
     };
 
     try {
