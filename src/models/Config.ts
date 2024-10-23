@@ -112,7 +112,7 @@ export default class Config {
     return true;
   }
 
-  public async addUserToConfig(
+  public async saveUserToConfig(
     id: string
   ): Promise<"ALREADY_EXISTS" | "ADDED" | "FAILED"> {
     if (this.getUserByID(id)) {

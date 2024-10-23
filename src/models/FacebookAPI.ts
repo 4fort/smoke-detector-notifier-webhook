@@ -5,6 +5,7 @@ dotenv.config();
 export default class FacebookAPI {
   private static PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
   private static PAGE_ID = process.env.PAGE_ID;
+  private static FACEBOOK_GRAPH_URL = `https://graph.facebook.com/v21.0/${this.PAGE_ID}/messages`;
 
   public static async sendMessage(
     text: string,
@@ -39,17 +40,14 @@ export default class FacebookAPI {
 
     try {
       console.log("Sending message: ", messageData);
-      const response = await fetch(
-        `https://graph.facebook.com/v21.0/${this.PAGE_ID}/messages`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(messageData),
-          cache: "no-cache",
-        }
-      );
+      const response = await fetch(this.FACEBOOK_GRAPH_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageData),
+        cache: "no-cache",
+      });
 
       const body = await response.json();
 
@@ -70,7 +68,7 @@ export default class FacebookAPI {
       console.log("Message sent");
       return { error: null, response: body };
     } catch (error: any) {
-      console.error("Fetch error:", error);
+      console.error("Error sending message to graph.facebook", error);
       return { error: error, response: null };
     }
   }
@@ -95,16 +93,13 @@ export default class FacebookAPI {
 
     try {
       console.log("Sending notification message request: ", messageData);
-      const response = await fetch(
-        `https://graph.facebook.com/v21.0/${this.PAGE_ID}/messages`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(messageData),
-        }
-      );
+      const response = await fetch(this.FACEBOOK_GRAPH_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageData),
+      });
 
       if (response.ok) {
         console.log("Notification Message Request sent");
@@ -119,6 +114,87 @@ export default class FacebookAPI {
       }
     } catch (error) {
       console.error("Fetch error:", error);
+      return { error: error, response: null };
+    }
+  }
+
+  public static async sendQuickReply(
+    text: string,
+    quickReplies: string[],
+    config: Config,
+    recipientID: string,
+    forceUserID = false
+  ): Promise<{
+    error: Record<string, string> | string | null;
+    response: Record<string, string> | null;
+  }> {
+    const userConfig = config.getUserByID(recipientID);
+
+    if (!userConfig) {
+      console.warn("No user found: ", recipientID);
+    }
+
+    const recipient =
+      forceUserID && userConfig
+        ? { id: userConfig.id }
+        : userConfig
+        ? config.getUserRecipientID(userConfig)
+        : {
+            id: recipientID,
+          };
+
+    const _quickReplies: {
+      content_type: "text";
+      title: string;
+      payload: string;
+    }[] = quickReplies.map((qr) => {
+      return {
+        content_type: "text",
+        title: qr,
+        payload: `QUICK_REPLY_PAYLOAD_${qr.split("").join("")}`,
+      };
+    });
+
+    const messageData = {
+      recipient,
+      messaging_type: "RESPONSE",
+      message: {
+        text,
+        quick_replies: _quickReplies,
+      },
+    };
+
+    try {
+      console.log("Sending quick reply: ", messageData);
+      const response = await fetch(this.FACEBOOK_GRAPH_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageData),
+        cache: "no-cache",
+      });
+
+      const body = await response.json();
+
+      if (!response.ok) {
+        console.error("Unable to send message:", body.error);
+
+        console.log("Retrying with user_id");
+        const _user_id = recipientID ? recipientID : userConfig!.id;
+        await this.sendMessage(
+          text,
+          config,
+          config.getUserByID(_user_id)?.id!,
+          true
+        );
+        return { error: body.error, response: null };
+      }
+
+      console.log("Quick reply message sent");
+      return { error: null, response: body };
+    } catch (error: any) {
+      console.error("Error sending quick reply to graph.facebook: ", error);
       return { error: error, response: null };
     }
   }

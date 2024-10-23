@@ -21,7 +21,7 @@ export async function handleMessage(
 ) {
   const userConfig = config.getUserByID(senderID);
   if (!userConfig) {
-    console.error("User not found in config");
+    console.warn("User not found in config");
   }
 
   if (messageText === PAGE_VERIFICATION_TOKEN) {
@@ -31,14 +31,38 @@ export async function handleMessage(
       return;
     }
 
+    // await FacebookAPI.sendMessage(
+    //   "You entered the correct verification token.",
+    //   config,
+    //   senderID,
+    //   true
+    // );
+
+    // TODO: create a function that update the specific users token
+
+    const newUser = await config.saveUserToConfig(senderID);
+
+    // TODO: if newUser === "ALREADY_EXIST" || newUser === "ADDED": sendQuickReply("Request further notifications", senderID) else if newUser === "FAILED": sendMessage("An internal server occured. Please try again later", senderID);
+
+    if (newUser !== "FAILED") {
+      await FacebookAPI.sendQuickReply(
+        "You entered the correct verification token.",
+        ["Request further notifications", "Cancel"],
+        config,
+        senderID,
+        true
+      );
+      return;
+    }
+
     await FacebookAPI.sendMessage(
-      "You entered the correct verification token.",
+      "An internal server error occurred. Please try again in a while.",
       config,
       senderID,
       true
     );
-    // TODO: create a function that update the specific users token
-    await sendOptInMessage(senderID, config);
+
+    // await sendOptInMessage(senderID, config);
     return;
   }
 
@@ -57,8 +81,11 @@ export async function handleMessage(
   return;
 }
 
+// TODO: change logic. Do not add user to config right away when entering verification token
+// only add them when they allow opting in
+
 export async function sendOptInMessage(senderID: string, config: Config) {
-  const newUser = await config.addUserToConfig(senderID);
+  const newUser = await config.saveUserToConfig(senderID);
   if (newUser === "FAILED") {
     await FacebookAPI.sendMessage(
       "An internal server error occurred. Please try again in a while.",
