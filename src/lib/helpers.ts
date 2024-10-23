@@ -86,21 +86,21 @@ export async function handleQuickReply(
   payload: "CONTINUE" | "CANCEL" | "REFRESH" | "STOP",
   config: Config
 ) {
-  switch (payload) {
-    case "CONTINUE":
-      return;
-      await FacebookAPI.sendNotifMessageReq(senderID);
-      return;
-    case "CANCEL":
-      await config.removeUserFromConfig(senderID);
-      return;
-    case "REFRESH":
-      await FacebookAPI.sendNotifMessageReq(senderID);
-      return;
-    case "STOP":
-      await config.removeUserFromConfig(senderID);
-      return;
-  }
+  // switch (payload) {
+  //   case "CONTINUE":
+  //     return;
+  //     await FacebookAPI.sendNotifMessageReq(senderID);
+  //     return;
+  //   case "CANCEL":
+  //     await config.removeUserFromConfig(senderID);
+  //     return;
+  //   case "REFRESH":
+  //     await FacebookAPI.sendNotifMessageReq(senderID);
+  //     return;
+  //   case "STOP":
+  //     await config.removeUserFromConfig(senderID);
+  //     return;
+  // }
 
   return;
 }
