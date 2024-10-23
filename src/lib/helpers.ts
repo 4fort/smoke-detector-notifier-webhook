@@ -88,6 +88,7 @@ export async function handleQuickReply(
 ) {
   switch (payload) {
     case "CONTINUE":
+      return;
       await FacebookAPI.sendNotifMessageReq(senderID);
       return;
     case "CANCEL":
@@ -98,8 +99,6 @@ export async function handleQuickReply(
       return;
     case "STOP":
       await config.removeUserFromConfig(senderID);
-      return;
-    default:
       return;
   }
 
