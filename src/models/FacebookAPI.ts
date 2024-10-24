@@ -22,15 +22,6 @@ export default class FacebookAPI {
       console.warn("No user found: ", recipientID);
     }
 
-    // const recipient =
-    //   forceUserID && userConfig
-    //     ? { id: userConfig.id }
-    //     : userConfig
-    //     ? config.getUserRecipientID(userConfig)
-    //     : {
-    //         id: recipientID,
-    //       };
-
     const recipient = forceUserID
       ? { id: recipientID }
       : userConfig && config.getUserRecipientID(userConfig);
@@ -58,14 +49,11 @@ export default class FacebookAPI {
       if (!response.ok) {
         console.error("Unable to send message:", body.error);
 
-        console.log("Retrying with user_id");
-        const _user_id = recipientID ? recipientID : userConfig!.id;
-        await this.sendMessage(
-          text,
-          config,
-          config.getUserByID(_user_id)?.id!,
-          true
-        );
+        if (body.error.code === 4 && body.error.error_subcode === 2018354) {
+          console.log("Retrying with user_id");
+          const userID = recipientID ? recipientID : userConfig!.id;
+          return await this.sendMessage(text, config, userID, true);
+        }
         return { error: body.error, response: null };
       }
 

@@ -67,7 +67,7 @@ export default class Config {
         return { error: data };
       }
     } catch (error) {
-      console.error("Error during fetch:", error);
+      console.error("Error setting config:", error);
       return { error };
     }
   }

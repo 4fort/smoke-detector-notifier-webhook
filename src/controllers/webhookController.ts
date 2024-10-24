@@ -203,12 +203,19 @@ export async function notifMsgRequest(req: Request, res: Response) {
 }
 
 export async function sendMessage(req: Request, res: Response) {
+  const config = new Config();
+  await config.fetchGetConfig();
+
   const body = req.body;
 
   const id = body.recipient_id;
+  const force = body.force;
 
-  const { error } = await sendFacebookMessage(body.text, id, true);
-  res.status(200).send({
+  // const { error } = await sendFacebookMessage(body.text, id, true);
+
+  const { error } = await FacebookAPI.sendMessage(body.text, config, id, force);
+
+  res.status(error ? 500 : 200).send({
     status: "EVENT_RECEIVED",
     error: error ? error : null,
   });
