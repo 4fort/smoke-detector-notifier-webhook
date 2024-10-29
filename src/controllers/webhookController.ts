@@ -143,7 +143,16 @@ export async function smokeDetected(req: Request, res: Response) {
   const config = new Config();
   await config.fetchGetConfig();
 
-  const text = "Smoke detected! at " + formatDate(new Date());
+  const text =
+    "Smoke detected at " +
+    new Date().toLocaleString("en-PH", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   const body = req.body;
   // const config = await getConfig();
 
